@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyAIcademy Curriculum Engine</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+
+    header p {
+      opacity: 0.9;
+      font-size: 14px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .section {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e1e5eb;
+    }
+
+    .section-header h2 {
+      font-size: 18px;
+      color: #333;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 5px;
+    }
+
+    .tab {
+      padding: 8px 16px;
+      background: #f0f0f0;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      color: #666;
+      border-radius: 5px;
+      transition: all 0.2s;
+    }
+
+    .tab:hover {
+      background: #e0e0e0;
+    }
+
+    .tab.active {
+      background: #667eea;
+      color: white;
+    }
+
+    /* Course Cards */
+    .course-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 15px;
+    }
+
+    .course-card {
+      border: 1px solid #e1e5eb;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .course-card-header {
+      padding: 12px 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .course-card-header.beginner { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); }
+    .course-card-header.intermediate { background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%); }
+    .course-card-header.advanced { background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%); }
+
+    .course-card-header h3 {
+      font-size: 14px;
+      margin-bottom: 3px;
+    }
+
+    .course-card-header .level-badge {
+      font-size: 11px;
+      opacity: 0.9;
+      text-transform: uppercase;
+    }
+
+    .course-card-body {
+      padding: 10px 15px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .lesson-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+    }
+
+    .lesson-item:last-child {
+      border-bottom: none;
+    }
+
+    .lesson-number {
+      width: 24px;
+      height: 24px;
+      background: #667eea;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: bold;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .lesson-title {
+      flex: 1;
+    }
+
+    .lesson-provider {
+      font-size: 11px;
+      color: #999;
+      margin-left: 10px;
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 8px;
+    }
+
+    /* Provider Cards */
+    .provider-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 15px;
+    }
+
+    .provider-card {
+      border: 1px solid #e1e5eb;
+      border-radius: 8px;
+      padding: 15px;
+      position: relative;
+    }
+
+    .provider-card.has-updates {
+      border-color: #ffc107;
+      background: #fffdf5;
+    }
+
+    .provider-card.has-updates::before {
+      content: 'NEW UPDATE';
+      position: absolute;
+      top: -10px;
+      right: 10px;
+      background: #28a745;
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 3px 8px;
+      border-radius: 10px;
+    }
+
+    .provider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .provider-name {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .provider-category {
+      font-size: 11px;
+      color: #666;
+      background: #f0f0f0;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .provider-links {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .provider-links a {
+      font-size: 12px;
+      color: #667eea;
+      text-decoration: none;
+    }
+
+    .provider-links a:hover {
+      text-decoration: underline;
+    }
+
+    .provider-update {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #e1e5eb;
+    }
+
+    .update-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .update-date {
+      font-size: 11px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+
+    .update-summary {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .doc-links {
+      background: #e8f5e9;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      border-left: 3px solid #28a745;
+    }
+
+    .doc-links h5 {
+      font-size: 11px;
+      color: #2e7d32;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    .doc-links a {
+      display: block;
+      font-size: 12px;
+      color: #1b5e20;
+      text-decoration: none;
+      padding: 3px 0;
+    }
+
+    .doc-links a:hover {
+      text-decoration: underline;
+    }
+
+    /* Recommendation Cards */
+    .recommendation-section {
+      margin-bottom: 25px;
+    }
+
+    .recommendation-section h3 {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .recommendation-section h3 .count {
+      background: #667eea;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+
+    .update-lesson-section h3 {
+      color: #e65100;
+    }
+
+    .update-lesson-section h3 .count {
+      background: #e65100;
+    }
+
+    .new-topic-section h3 {
+      color: #1565c0;
+    }
+
+    .new-topic-section h3 .count {
+      background: #1565c0;
+    }
+
+    .report-card {
+      border: 1px solid #e1e5eb;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+    }
+
+    .report-card.update-lesson {
+      border-left: 4px solid #e65100;
+      background: #fff3e0;
+    }
+
+    .report-card.create-lesson {
+      border-left: 4px solid #1565c0;
+      background: #e3f2fd;
+    }
+
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .report-provider {
+      font-weight: 600;
+    }
+
+    .report-meta {
+      display: flex;
+      gap: 8px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-critical { background: #f8d7da; color: #721c24; }
+    .badge-high { background: #fff3cd; color: #856404; }
+    .badge-medium { background: #d1ecf1; color: #0c5460; }
+    .badge-low { background: #d4edda; color: #155724; }
+    .badge-info { background: #e2e3e5; color: #383d41; }
+
+    .badge-new { background: #cce5ff; color: #004085; }
+    .badge-approved { background: #d4edda; color: #155724; }
+    .badge-rejected { background: #f8d7da; color: #721c24; }
+    .badge-assigned { background: #fff3cd; color: #856404; }
+    .badge-done { background: #d1ecf1; color: #0c5460; }
+
+    .report-rationale {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .report-affected {
+      margin: 10px 0;
+    }
+
+    .report-affected h5 {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 5px;
+    }
+
+    .affected-lesson {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 8px;
+      background: rgba(255,255,255,0.8);
+      border-radius: 4px;
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+
+    .report-citations {
+      margin-top: 10px;
+      padding: 10px;
+      background: #e8f5e9;
+      border-radius: 5px;
+      border-left: 3px solid #28a745;
+    }
+
+    .report-citations h5 {
+      font-size: 11px;
+      color: #2e7d32;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    .report-citations a {
+      display: block;
+      font-size: 12px;
+      color: #1b5e20;
+      text-decoration: none;
+    }
+
+    .report-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(0,0,0,0.1);
+    }
+
+    /* Mapping Rules */
+    .mapping-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .mapping-table th,
+    .mapping-table td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #e1e5eb;
+      font-size: 13px;
+    }
+
+    .mapping-table th {
+      background: #f8f9fa;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #666;
+    }
+
+    .mapping-table tr:hover {
+      background: #f8f9fa;
+    }
+
+    /* Buttons */
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5a6fd6;
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+
+    .btn-small {
+      padding: 5px 10px;
+      font-size: 11px;
+    }
+
+    .btn-outline {
+      background: white;
+      border: 1px solid #667eea;
+      color: #667eea;
+    }
+
+    .btn-outline:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background: #333;
+      color: white;
+      border-radius: 5px;
+      z-index: 2000;
+      display: none;
+    }
+
+    .toast.show {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-content h3 {
+      margin-bottom: 15px;
+    }
+
+    .modal-content .close {
+      float: right;
+      cursor: pointer;
+      font-size: 20px;
+      color: #999;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    /* Filter bar */
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-bar select {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 13px;
+    }
+
+    .filter-bar label {
+      font-size: 13px;
+      color: #666;
+    }
+
+    /* Track filter tabs */
+    .track-tabs {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .track-tab {
+      padding: 6px 12px;
+      background: #f0f0f0;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      color: #666;
+      border-radius: 15px;
+      transition: all 0.2s;
+    }
+
+    .track-tab:hover {
+      background: #e0e0e0;
+    }
+
+    .track-tab.active {
+      background: #667eea;
+      color: white;
+    }
+
+    /* Recent indicator */
+    .recent-badge {
+      background: #28a745;
+      color: white;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      margin-left: 8px;
+    }
+
+    /* Stats bar */
+    .stats-bar {
+      display: flex;
+      gap: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: #666;
+      text-transform: uppercase;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+
+    /* Recency filter highlight */
+    .recency-notice {
+      background: #e3f2fd;
+      border: 1px solid #90caf9;
+      border-radius: 5px;
+      padding: 10px 15px;
+      margin-bottom: 15px;
+      font-size: 13px;
+      color: #1565c0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>MyAIcademy Curriculum Engine</h1>
+        <p>Manage courses, track provider updates, and maintain curriculum quality</p>
+      </div>
+      <div class="header-actions">
+        <a href="/lesson-builder.html" class="btn-secondary" style="text-decoration: none; background: white; color: #667eea; border: 2px solid white;">Lesson Builder</a>
+        <button class="btn-primary" onclick="fetchUpdates()">Check for Updates</button>
+      </div>
+    </header>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-value" id="stat-courses">-</div>
+        <div class="stat-label">Courses</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-lessons">-</div>
+        <div class="stat-label">Lessons</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-providers">-</div>
+        <div class="stat-label">Providers</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-updates">-</div>
+        <div class="stat-label">Recent Updates</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="stat-pending">-</div>
+        <div class="stat-label">Pending Actions</div>
+      </div>
+    </div>
+
+    <!-- Section 1: Courses & Lessons -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Courses & Lessons</h2>
+        <div class="track-tabs">
+          <button class="track-tab active" data-track="all">All Tracks</button>
+          <button class="track-tab" data-track="high_school">High School</button>
+          <button class="track-tab" data-track="college">College</button>
+          <button class="track-tab" data-track="early_career">Early Career</button>
+          <button class="track-tab" data-track="creative">Creative</button>
+          <button class="track-tab" data-track="entrepreneur">Entrepreneur</button>
+          <button class="track-tab" data-track="everyone">Everyone</button>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <label>Level:</label>
+        <select id="level-filter" onchange="renderCourses()">
+          <option value="all">All Levels</option>
+          <option value="beginner">Beginner</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+      </div>
+      <div class="course-grid" id="courses-container">
+        <div class="loading">Loading courses...</div>
+      </div>
+    </div>
+
+    <!-- Section 2: Providers & Updates -->
+    <div class="section">
+      <div class="section-header">
+        <h2>AI Providers & Recent Updates</h2>
+        <div class="tabs">
+          <button class="tab active" data-view="with-updates">With Updates</button>
+          <button class="tab" data-view="all-providers">All Providers</button>
+        </div>
+      </div>
+      <div class="recency-notice" id="recency-notice">
+        Showing updates from the last <strong>7 days</strong> only. Older updates are filtered out to focus on what needs attention now.
+      </div>
+      <div class="filter-bar">
+        <label>Category:</label>
+        <select id="category-filter" onchange="renderProviders()">
+          <option value="all">All Categories</option>
+          <option value="llm">LLMs</option>
+          <option value="image">Image Generation</option>
+          <option value="video">Video</option>
+          <option value="audio">Audio</option>
+          <option value="research">Research</option>
+          <option value="automation">Automation</option>
+          <option value="nocode">No-Code</option>
+          <option value="data">Data</option>
+        </select>
+        <label style="margin-left: 20px;">Updates from:</label>
+        <select id="recency-filter" onchange="renderProviders()">
+          <option value="7" selected>Last 7 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 90 days</option>
+        </select>
+      </div>
+      <div class="provider-grid" id="providers-container">
+        <div class="loading">Loading providers...</div>
+      </div>
+    </div>
+
+    <!-- Section 3: Recommendations (Split into two categories) -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Curriculum Recommendations</h2>
+        <button class="btn-outline btn-small" onclick="analyzeUpdates()">Analyze New Updates</button>
+      </div>
+
+      <!-- Update Existing Lessons -->
+      <div class="recommendation-section update-lesson-section">
+        <h3>
+          Update Existing Lessons
+          <span class="count" id="update-lesson-count">0</span>
+        </h3>
+        <p style="font-size: 13px; color: #666; margin-bottom: 15px;">
+          These lessons cover technology that has been updated. Review and update the content.
+        </p>
+        <div id="update-lesson-reports">
+          <div class="empty-state">No lessons need updating</div>
+        </div>
+      </div>
+
+      <!-- New Topics to Cover -->
+      <div class="recommendation-section new-topic-section">
+        <h3>
+          New Topics to Cover
+          <span class="count" id="new-topic-count">0</span>
+        </h3>
+        <p style="font-size: 13px; color: #666; margin-bottom: 15px;">
+          New features or capabilities from our providers that should become new lessons.
+        </p>
+        <div id="new-topic-reports">
+          <div class="empty-state">No new topics identified</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Mapping Matrix -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Course Mapping Rules</h2>
+        <button class="btn-outline btn-small" onclick="showAddRuleModal()">+ Add Rule</button>
+      </div>
+      <div class="filter-bar">
+        <label>Question:</label>
+        <select id="question-filter" onchange="loadMappingRules()">
+          <option value="">All Questions</option>
+          <option value="Q2">Q2: User Role (Primary)</option>
+          <option value="Q3">Q3: AI Familiarity</option>
+          <option value="Q4">Q4: Learning Motivation</option>
+          <option value="Q5">Q5: Learning Goal</option>
+          <option value="Q9">Q9: Field/Profession</option>
+        </select>
+      </div>
+      <div id="mapping-container">
+        <div class="loading">Loading mapping rules...</div>
+      </div>
+    </div>
+
+    <!-- Section 5: Audit Log -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Audit Log</h2>
+      </div>
+      <div id="audit-container">
+        <div class="loading">Loading audit logs...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assign Modal -->
+  <div class="modal" id="assign-modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('assign-modal')">&times;</span>
+      <h3>Assign Report</h3>
+      <form onsubmit="submitAssignment(event)">
+        <input type="hidden" id="assign-report-id">
+        <div class="form-group">
+          <label>Assignee Name</label>
+          <input type="text" id="assign-name" required placeholder="Enter name...">
+        </div>
+        <button type="submit" class="btn-primary">Assign</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Rule Modal -->
+  <div class="modal" id="edit-rule-modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('edit-rule-modal')">&times;</span>
+      <h3 id="rule-modal-title">Edit Mapping Rule</h3>
+      <form id="edit-rule-form" onsubmit="saveRule(event)">
+        <input type="hidden" id="rule-id">
+        <div class="form-group">
+          <label>Question ID</label>
+          <input type="text" id="rule-question-id" placeholder="e.g., Q2">
+        </div>
+        <div class="form-group">
+          <label>Question Text</label>
+          <input type="text" id="rule-question-text" placeholder="e.g., What are you right now?">
+        </div>
+        <div class="form-group">
+          <label>Answer Value</label>
+          <input type="text" id="rule-answer-value" placeholder="e.g., College student (18-22)">
+        </div>
+        <div class="form-group">
+          <label>Recommended Course</label>
+          <input type="text" id="rule-recommended-course" placeholder="e.g., Applied AI for College Students">
+        </div>
+        <div class="form-group">
+          <label>Recommended Track</label>
+          <select id="rule-recommended-track">
+            <option value="">None</option>
+            <option value="high_school">High School</option>
+            <option value="college">College</option>
+            <option value="early_career">Early Career</option>
+            <option value="creative">Creative</option>
+            <option value="entrepreneur">Entrepreneur</option>
+            <option value="everyone">Everyone</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Priority (1-10)</label>
+          <input type="number" id="rule-priority" min="1" max="10" value="5">
+        </div>
+        <button type="submit" class="btn-primary">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API_BASE = 'http://localhost:3001/api';
+
+    // State
+    let currentTrack = 'all';
+    let currentProviderView = 'with-updates';
+    let allCourses = [];
+    let courseLessonsCache = {};
+    let allProviders = [];
+    let allUpdates = [];
+
+    // Format date nicely
+    function formatDate(dateStr) {
+      if (!dateStr) return 'Unknown';
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    // Toast notification
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Modal helpers
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    // Track tab handlers
+    document.querySelectorAll('.track-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.track-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentTrack = tab.dataset.track;
+        renderCourses();
+      });
+    });
+
+    // Provider view handlers
+    document.querySelectorAll('.section:nth-child(4) .tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.section:nth-child(4) .tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentProviderView = tab.dataset.view;
+        renderProviders();
+      });
+    });
+
+    // Load stats
+    async function loadStats() {
+      try {
+        const res = await fetch(`${API_BASE}/dashboard/stats`);
+        const { data } = await res.json();
+
+        document.getElementById('stat-courses').textContent = data.courses.count;
+        document.getElementById('stat-lessons').textContent = data.lessons.count;
+        document.getElementById('stat-providers').textContent = data.providers.count;
+        document.getElementById('stat-updates').textContent = data.updates.count;
+        document.getElementById('stat-pending').textContent = data.impact_reports.by_status.new;
+      } catch (err) {
+        console.error('Error loading stats:', err);
+      }
+    }
+
+    // Load courses and then fetch lessons for each
+    async function loadCourses() {
+      try {
+        const res = await fetch(`${API_BASE}/courses`);
+        const { data } = await res.json();
+        allCourses = data;
+
+        // Fetch lessons for each course (in parallel)
+        const lessonPromises = data.map(async (course) => {
+          try {
+            const lessonsRes = await fetch(`${API_BASE}/courses/${course.id}/lessons`);
+            const { data: lessons } = await lessonsRes.json();
+            courseLessonsCache[course.id] = lessons;
+          } catch (err) {
+            console.error(`Error loading lessons for course ${course.id}:`, err);
+            courseLessonsCache[course.id] = [];
+          }
+        });
+
+        await Promise.all(lessonPromises);
+        renderCourses();
+      } catch (err) {
+        console.error('Error loading courses:', err);
+        document.getElementById('courses-container').innerHTML = '<div class="empty-state">Error loading courses</div>';
+      }
+    }
+
+    function renderCourses() {
+      const container = document.getElementById('courses-container');
+      const levelFilter = document.getElementById('level-filter').value;
+
+      let courses = allCourses;
+
+      // Filter by track
+      if (currentTrack !== 'all') {
+        courses = courses.filter(c => c.track === currentTrack);
+      }
+
+      // Filter by level
+      if (levelFilter !== 'all') {
+        courses = courses.filter(c => c.level === levelFilter);
+      }
+
+      if (courses.length === 0) {
+        container.innerHTML = '<div class="empty-state">No courses match the filters</div>';
+        return;
+      }
+
+      container.innerHTML = courses.map(course => {
+        const lessons = courseLessonsCache[course.id] || [];
+
+        return `
+          <div class="course-card">
+            <div class="course-card-header ${course.level}">
+              <h3>${course.name}</h3>
+              <div class="level-badge">${course.level} | ${course.track.replace('_', ' ')} | ${lessons.length} lessons</div>
+            </div>
+            <div class="course-card-body">
+              ${lessons.length > 0 ? lessons.map((lesson, i) => `
+                <div class="lesson-item">
+                  <div class="lesson-number">${lesson.position || (i + 1)}</div>
+                  <div class="lesson-title">${lesson.title}</div>
+                  <div class="lesson-provider">${lesson.provider_name}</div>
+                </div>
+              `).join('') : '<div class="empty-state">No lessons assigned yet</div>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Load providers
+    async function loadProviders() {
+      try {
+        const [providersRes, updatesRes] = await Promise.all([
+          fetch(`${API_BASE}/providers`),
+          fetch(`${API_BASE}/updates`)
+        ]);
+
+        const { data: providers } = await providersRes.json();
+        const { data: updates } = await updatesRes.json();
+
+        allProviders = providers;
+        allUpdates = updates;
+
+        renderProviders();
+      } catch (err) {
+        console.error('Error loading providers:', err);
+        document.getElementById('providers-container').innerHTML = '<div class="empty-state">Error loading providers</div>';
+      }
+    }
+
+    function renderProviders() {
+      const container = document.getElementById('providers-container');
+      const categoryFilter = document.getElementById('category-filter').value;
+      const recencyFilter = parseInt(document.getElementById('recency-filter').value);
+
+      // Update recency notice
+      document.getElementById('recency-notice').innerHTML =
+        `Showing updates from the last <strong>${recencyFilter} days</strong> only. Older updates are filtered out to focus on what needs attention now.`;
+
+      // Calculate recency cutoff
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - recencyFilter);
+
+      // Filter updates by recency (ONLY recent updates)
+      const recentUpdates = allUpdates.filter(u => {
+        const updateDate = new Date(u.fetched_at);
+        return updateDate >= cutoffDate;
+      });
+
+      // Map updates to providers
+      const providerUpdates = {};
+      recentUpdates.forEach(u => {
+        if (!providerUpdates[u.provider]) {
+          providerUpdates[u.provider] = [];
+        }
+        providerUpdates[u.provider].push(u);
+      });
+
+      let providers = allProviders;
+
+      // Filter by category
+      if (categoryFilter !== 'all') {
+        providers = providers.filter(p => p.category === categoryFilter);
+      }
+
+      // Filter by view mode
+      if (currentProviderView === 'with-updates') {
+        providers = providers.filter(p => providerUpdates[p.name] || providerUpdates[p.name.split(' ')[0]]);
+      }
+
+      if (providers.length === 0) {
+        container.innerHTML = `<div class="empty-state">
+          ${currentProviderView === 'with-updates' ? 'No providers with updates in the last ' + recencyFilter + ' days. Click "Check for Updates" to fetch latest.' : 'No providers match the filters'}
+        </div>`;
+        return;
+      }
+
+      container.innerHTML = providers.map(provider => {
+        const updates = providerUpdates[provider.name] || providerUpdates[provider.name.split(' ')[0]] || [];
+        const hasUpdates = updates.length > 0;
+        const latestUpdate = updates[0];
+
+        return `
+          <div class="provider-card ${hasUpdates ? 'has-updates' : ''}">
+            <div class="provider-header">
+              <div class="provider-name">${provider.name}</div>
+              <div class="provider-category">${provider.category}</div>
+            </div>
+            <div class="provider-links">
+              ${provider.website_url ? `<a href="${provider.website_url}" target="_blank">Website</a>` : ''}
+              ${provider.changelog_url ? `<a href="${provider.changelog_url}" target="_blank">Changelog</a>` : ''}
+            </div>
+            ${hasUpdates ? `
+              <div class="provider-update">
+                <div class="update-title">${latestUpdate.title}</div>
+                <div class="update-date">
+                  <strong>Published: ${formatDate(latestUpdate.published_at)}</strong>
+                  <span class="recent-badge">Recent</span>
+                </div>
+                <div class="update-summary">${latestUpdate.summary || latestUpdate.raw_text?.slice(0, 150) + '...' || ''}</div>
+                <div class="doc-links">
+                  <h5>Official Documentation</h5>
+                  <a href="${latestUpdate.source_url}" target="_blank">Announcement: ${latestUpdate.title}</a>
+                  ${(latestUpdate.doc_urls || []).map(doc => `
+                    <a href="${doc.url}" target="_blank">${doc.label}</a>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Fetch new updates
+    async function fetchUpdates() {
+      try {
+        showToast('Checking for updates...');
+        const res = await fetch(`${API_BASE}/updates/fetch`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ simulated: true })
+        });
+        const { data, message } = await res.json();
+        showToast(message || `Found ${data.length} updates`);
+        loadProviders();
+        loadStats();
+      } catch (err) {
+        showToast('Error checking for updates');
+        console.error(err);
+      }
+    }
+
+    // Analyze updates
+    async function analyzeUpdates() {
+      try {
+        showToast('Analyzing updates...');
+        const res = await fetch(`${API_BASE}/impact-reports/analyze`, { method: 'POST' });
+        const { data, message } = await res.json();
+        showToast(message || `Generated ${data.length} reports`);
+        loadReports();
+        loadStats();
+      } catch (err) {
+        showToast('Error analyzing updates');
+        console.error(err);
+      }
+    }
+
+    // Load impact reports (split into two categories)
+    async function loadReports() {
+      try {
+        // Fetch all new/pending reports
+        const res = await fetch(`${API_BASE}/impact-reports?status=new`);
+        const { data } = await res.json();
+
+        // Split into two categories
+        const updateLessonReports = data.filter(r => r.recommended_action === 'update_lesson');
+        const newTopicReports = data.filter(r => r.recommended_action === 'create_lesson');
+
+        // Update counts
+        document.getElementById('update-lesson-count').textContent = updateLessonReports.length;
+        document.getElementById('new-topic-count').textContent = newTopicReports.length;
+
+        // Render Update Existing Lessons
+        const updateContainer = document.getElementById('update-lesson-reports');
+        if (updateLessonReports.length === 0) {
+          updateContainer.innerHTML = '<div class="empty-state">No lessons need updating right now</div>';
+        } else {
+          updateContainer.innerHTML = updateLessonReports.map(report => renderReportCard(report, 'update-lesson')).join('');
+        }
+
+        // Render New Topics
+        const newTopicContainer = document.getElementById('new-topic-reports');
+        if (newTopicReports.length === 0) {
+          newTopicContainer.innerHTML = '<div class="empty-state">No new topics identified from recent updates</div>';
+        } else {
+          newTopicContainer.innerHTML = newTopicReports.map(report => renderReportCard(report, 'create-lesson')).join('');
+        }
+      } catch (err) {
+        console.error('Error loading reports:', err);
+      }
+    }
+
+    function renderReportCard(report, type) {
+      return `
+        <div class="report-card ${type}">
+          <div class="report-header">
+            <div class="report-provider">${report.provider}</div>
+            <div class="report-meta">
+              <span class="badge badge-${report.severity}">${report.severity}</span>
+            </div>
+          </div>
+          <div class="report-rationale">${report.rationale}</div>
+
+          ${report.affected_lessons.length > 0 ? `
+            <div class="report-affected">
+              <h5>Affected Lessons (${report.affected_lessons.length})</h5>
+              ${report.affected_lessons.slice(0, 3).map(l => `
+                <div class="affected-lesson">
+                  <span>${l.lesson_title}</span>
+                  <span style="color: #666; font-size: 11px;">${l.suggested_changes?.slice(0, 60)}...</span>
+                </div>
+              `).join('')}
+              ${report.affected_lessons.length > 3 ? `<div style="font-size: 11px; color: #666; margin-top: 5px;">+${report.affected_lessons.length - 3} more lessons</div>` : ''}
+            </div>
+          ` : ''}
+
+          ${report.citations.length > 0 ? `
+            <div class="report-citations">
+              <h5>Official Documentation to Build/Update Lesson</h5>
+              ${report.citations.map(c => `<a href="${c.url}" target="_blank">${c.text}</a>`).join('')}
+            </div>
+          ` : ''}
+
+          <div class="report-actions">
+            <button class="btn-success btn-small" onclick="approveReport('${report.id}')">Approve</button>
+            <button class="btn-danger btn-small" onclick="rejectReport('${report.id}')">Reject</button>
+            <button class="btn-primary btn-small" onclick="showAssignModal('${report.id}')">Assign</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Report actions
+    async function approveReport(id) {
+      try {
+        await fetch(`${API_BASE}/impact-reports/${id}/approve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ actor: 'dashboard-user' })
+        });
+        showToast('Report approved');
+        loadReports();
+        loadStats();
+      } catch (err) {
+        showToast('Error approving report');
+      }
+    }
+
+    async function rejectReport(id) {
+      try {
+        await fetch(`${API_BASE}/impact-reports/${id}/reject`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ actor: 'dashboard-user' })
+        });
+        showToast('Report rejected');
+        loadReports();
+        loadStats();
+      } catch (err) {
+        showToast('Error rejecting report');
+      }
+    }
+
+    function showAssignModal(id) {
+      document.getElementById('assign-report-id').value = id;
+      document.getElementById('assign-name').value = '';
+      document.getElementById('assign-modal').classList.add('active');
+    }
+
+    async function submitAssignment(e) {
+      e.preventDefault();
+      const id = document.getElementById('assign-report-id').value;
+      const assignee = document.getElementById('assign-name').value;
+
+      try {
+        await fetch(`${API_BASE}/impact-reports/${id}/assign`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ assignee, actor: 'dashboard-user' })
+        });
+        showToast(`Assigned to ${assignee}`);
+        closeModal('assign-modal');
+        loadReports();
+      } catch (err) {
+        showToast('Error assigning report');
+      }
+    }
+
+    // Load mapping rules
+    async function loadMappingRules() {
+      try {
+        const questionId = document.getElementById('question-filter').value;
+        let url = `${API_BASE}/mapping-rules?is_active=true`;
+        if (questionId) url += `&question_id=${questionId}`;
+
+        const res = await fetch(url);
+        const { data } = await res.json();
+
+        const container = document.getElementById('mapping-container');
+
+        if (data.length === 0) {
+          container.innerHTML = '<div class="empty-state">No mapping rules found</div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <table class="mapping-table">
+            <thead>
+              <tr>
+                <th>Question</th>
+                <th>Answer</th>
+                <th>Recommended Course</th>
+                <th>Track</th>
+                <th>Priority</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.map(r => `
+                <tr>
+                  <td><strong>${r.question_id}</strong><br><span style="font-size: 11px; color: #666;">${r.question_text}</span></td>
+                  <td>${r.answer_value}</td>
+                  <td>${r.recommended_course || '-'}</td>
+                  <td>${r.recommended_track || '-'}</td>
+                  <td>${r.priority}</td>
+                  <td><button class="btn-secondary btn-small" onclick="editRule('${r.id}')">Edit</button></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (err) {
+        console.error('Error loading mapping rules:', err);
+        document.getElementById('mapping-container').innerHTML = '<div class="empty-state">Error loading rules</div>';
+      }
+    }
+
+    // Edit mapping rule
+    async function editRule(id) {
+      try {
+        const res = await fetch(`${API_BASE}/mapping-rules/${id}`);
+        const { data } = await res.json();
+
+        document.getElementById('rule-modal-title').textContent = 'Edit Mapping Rule';
+        document.getElementById('rule-id').value = data.id;
+        document.getElementById('rule-question-id').value = data.question_id;
+        document.getElementById('rule-question-text').value = data.question_text;
+        document.getElementById('rule-answer-value').value = data.answer_value;
+        document.getElementById('rule-recommended-course').value = data.recommended_course || '';
+        document.getElementById('rule-recommended-track').value = data.recommended_track || '';
+        document.getElementById('rule-priority').value = data.priority;
+
+        document.getElementById('edit-rule-modal').classList.add('active');
+      } catch (err) {
+        showToast('Error loading rule');
+        console.error(err);
+      }
+    }
+
+    function showAddRuleModal() {
+      document.getElementById('rule-modal-title').textContent = 'Add Mapping Rule';
+      document.getElementById('rule-id').value = '';
+      document.getElementById('rule-question-id').value = '';
+      document.getElementById('rule-question-text').value = '';
+      document.getElementById('rule-answer-value').value = '';
+      document.getElementById('rule-recommended-course').value = '';
+      document.getElementById('rule-recommended-track').value = '';
+      document.getElementById('rule-priority').value = '5';
+      document.getElementById('edit-rule-modal').classList.add('active');
+    }
+
+    async function saveRule(e) {
+      e.preventDefault();
+      const id = document.getElementById('rule-id').value;
+      const ruleData = {
+        question_id: document.getElementById('rule-question-id').value,
+        question_text: document.getElementById('rule-question-text').value,
+        answer_value: document.getElementById('rule-answer-value').value,
+        recommended_course: document.getElementById('rule-recommended-course').value || null,
+        recommended_track: document.getElementById('rule-recommended-track').value || null,
+        priority: parseInt(document.getElementById('rule-priority').value),
+        actor: 'dashboard-user'
+      };
+
+      try {
+        if (id) {
+          await fetch(`${API_BASE}/mapping-rules/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(ruleData)
+          });
+          showToast('Rule updated');
+        } else {
+          await fetch(`${API_BASE}/mapping-rules`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(ruleData)
+          });
+          showToast('Rule created');
+        }
+        closeModal('edit-rule-modal');
+        loadMappingRules();
+      } catch (err) {
+        showToast('Error saving rule');
+        console.error(err);
+      }
+    }
+
+    // Load audit logs
+    async function loadAuditLogs() {
+      try {
+        const res = await fetch(`${API_BASE}/audit-logs`);
+        const { data } = await res.json();
+
+        const container = document.getElementById('audit-container');
+
+        if (data.length === 0) {
+          container.innerHTML = '<div class="empty-state">No audit logs yet</div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <table class="mapping-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Entity</th>
+                <th>Action</th>
+                <th>Actor</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.slice(0, 20).map(l => `
+                <tr>
+                  <td>${new Date(l.timestamp).toLocaleString()}</td>
+                  <td>${l.entity_type}</td>
+                  <td><span class="badge badge-${l.action === 'approve' ? 'approved' : l.action === 'reject' ? 'rejected' : 'info'}">${l.action}</span></td>
+                  <td>${l.actor || 'system'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (err) {
+        console.error('Error loading audit logs:', err);
+        document.getElementById('audit-container').innerHTML = '<div class="empty-state">Error loading logs</div>';
+      }
+    }
+
+    // Initialize
+    loadStats();
+    loadCourses();
+    loadProviders();
+    loadReports();
+    loadMappingRules();
+    loadAuditLogs();
+
+    // Refresh stats periodically
+    setInterval(loadStats, 30000);
+  </script>
+</body>
+</html>

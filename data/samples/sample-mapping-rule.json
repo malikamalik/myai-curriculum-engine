@@ -1,0 +1,13 @@
+{
+  "id": "sample-rule-001",
+  "version": 1,
+  "question_id": "Q2",
+  "question_text": "What are you right now?",
+  "answer_value": "College student (18–22)",
+  "recommended_course": "Applied AI for College Students",
+  "recommended_track": "college",
+  "priority": 10,
+  "is_active": true,
+  "created_at": "2024-01-01T00:00:00.000Z",
+  "created_by": "system"
+}

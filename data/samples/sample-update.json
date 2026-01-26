@@ -1,0 +1,12 @@
+{
+  "id": "sample-update-001",
+  "provider_id": null,
+  "provider": "OpenAI",
+  "title": "GPT-4o with Enhanced Reasoning Capabilities",
+  "summary": "OpenAI announces improvements to GPT-4o including better multi-step reasoning, enhanced code generation, and new multimodal features for image understanding.",
+  "published_at": "2024-01-15T10:00:00.000Z",
+  "source_url": "https://openai.com/blog/gpt-4o-reasoning-update",
+  "raw_text": "GPT-4o with Enhanced Reasoning Capabilities\n\nWe're excited to announce significant improvements to GPT-4o. This update includes:\n\n- Better multi-step reasoning: GPT-4o can now break down complex problems more effectively\n- Enhanced code generation: Improved accuracy for Python, JavaScript, and other languages\n- New multimodal features: Better understanding of images and documents\n\nThese improvements are available immediately to all ChatGPT Plus and API users.",
+  "fetched_at": "2024-01-15T12:00:00.000Z",
+  "processed": false
+}

@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Database
+data/dev.db
+data/dev.db-wal
+data/dev.db-shm
+
+# Snapshots (can be large)
+data/snapshots/*
+!data/snapshots/.gitkeep
+
+# Parsed output (generated)
+context/parsed/*
+!context/parsed/.gitkeep
+
+# Environment
+.env
+.env.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/

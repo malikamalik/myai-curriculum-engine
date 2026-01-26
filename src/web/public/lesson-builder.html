@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lesson Builder - MyAIcademy Curriculum Engine</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+
+    header p {
+      opacity: 0.9;
+      font-size: 14px;
+    }
+
+    .back-link {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .back-link:hover {
+      opacity: 1;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 1000px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .section {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .section h2 {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e1e5eb;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .form-group label .required {
+      color: #dc3545;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form-group .hint {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-outline {
+      background: white;
+      border: 1px solid #667eea;
+      color: #667eea;
+    }
+
+    /* Provider Selection */
+    .provider-select {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .provider-option {
+      padding: 12px;
+      border: 2px solid #e1e5eb;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .provider-option:hover {
+      border-color: #667eea;
+    }
+
+    .provider-option.selected {
+      border-color: #667eea;
+      background: #f0f4ff;
+    }
+
+    .provider-option .provider-name {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .provider-option .provider-category {
+      font-size: 11px;
+      color: #666;
+    }
+
+    /* Preview Panel */
+    .preview-panel {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      overflow: hidden;
+      height: calc(100vh - 140px);
+      position: sticky;
+      top: 20px;
+    }
+
+    .preview-header {
+      background: #1a1a2e;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .preview-header h3 {
+      font-size: 16px;
+    }
+
+    .preview-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .preview-actions button {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .preview-content {
+      padding: 20px;
+      height: calc(100% - 60px);
+      overflow-y: auto;
+    }
+
+    .preview-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #999;
+      text-align: center;
+    }
+
+    .preview-placeholder .icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    /* Slide Preview */
+    .slide-preview {
+      background: white;
+      border: 1px solid #e1e5eb;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      overflow: hidden;
+    }
+
+    .slide-header {
+      background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+      color: white;
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .slide-number {
+      background: #20b2aa;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .slide-body {
+      padding: 15px;
+      min-height: 120px;
+    }
+
+    .slide-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #20b2aa;
+      margin-bottom: 10px;
+    }
+
+    .slide-content {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .slide-screenshot-placeholder {
+      background: #f8f9fa;
+      border: 2px dashed #ddd;
+      border-radius: 6px;
+      padding: 30px;
+      text-align: center;
+      margin-top: 10px;
+      color: #999;
+    }
+
+    /* Progress indicator */
+    .progress-bar {
+      height: 4px;
+      background: #e1e5eb;
+      border-radius: 2px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+
+    /* Loading state */
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e1e5eb;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      margin-top: 15px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    /* Generated Output */
+    .output-section {
+      margin-top: 20px;
+    }
+
+    .output-tabs {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 15px;
+    }
+
+    .output-tab {
+      padding: 8px 16px;
+      background: #f0f0f0;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      border-radius: 5px 5px 0 0;
+    }
+
+    .output-tab.active {
+      background: #667eea;
+      color: white;
+    }
+
+    .output-content {
+      background: #1a1a2e;
+      border-radius: 0 8px 8px 8px;
+      padding: 20px;
+      color: #e1e5eb;
+      font-family: monospace;
+      font-size: 13px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background: #333;
+      color: white;
+      border-radius: 5px;
+      z-index: 2000;
+      display: none;
+    }
+
+    .toast.show {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Template info */
+    .template-info {
+      background: #e8f5e9;
+      border-left: 4px solid #28a745;
+      padding: 15px;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 20px;
+    }
+
+    .template-info h4 {
+      font-size: 14px;
+      color: #2e7d32;
+      margin-bottom: 8px;
+    }
+
+    .template-info ul {
+      margin-left: 20px;
+      font-size: 13px;
+      color: #1b5e20;
+    }
+
+    .template-info ul li {
+      margin-bottom: 4px;
+    }
+
+    /* Download buttons */
+    .download-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .download-buttons button {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <a href="/" class="back-link">&larr; Back to Dashboard</a>
+        <h1>Lesson Builder</h1>
+        <p>Generate MyAIcademy presentation slides and step-by-step documentation</p>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <!-- Input Form -->
+      <div class="input-panel">
+        <div class="section">
+          <h2>Lesson Configuration</h2>
+
+          <div class="form-group">
+            <label>Lesson Title <span class="required">*</span></label>
+            <input type="text" id="lesson-title" placeholder="e.g., Build Apps Without Code with Lovable">
+          </div>
+
+          <div class="form-group">
+            <label>AI Provider/Tool <span class="required">*</span></label>
+            <select id="provider-select">
+              <option value="">Select a provider...</option>
+              <option value="ChatGPT">ChatGPT (OpenAI)</option>
+              <option value="Claude">Claude (Anthropic)</option>
+              <option value="Gemini">Gemini (Google)</option>
+              <option value="MidJourney">MidJourney</option>
+              <option value="ElevenLabs">ElevenLabs</option>
+              <option value="Lovable">Lovable</option>
+              <option value="n8n">n8n</option>
+              <option value="Canva">Canva AI</option>
+              <option value="Veo">Google Veo</option>
+              <option value="Sora">OpenAI Sora</option>
+              <option value="NotebookLM">NotebookLM</option>
+              <option value="Perplexity">Perplexity AI</option>
+              <option value="Julius AI">Julius AI</option>
+              <option value="Gamma">Gamma</option>
+              <option value="Replit">Replit</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Level <span class="required">*</span></label>
+            <select id="level-select">
+              <option value="">Select level...</option>
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Target Audience <span class="required">*</span></label>
+            <select id="audience-select">
+              <option value="">Select audience...</option>
+              <option value="high_school">High School Students (14-18)</option>
+              <option value="college">College Students (18-22)</option>
+              <option value="early_career">Early Career Professionals</option>
+              <option value="creative">Creative Professionals</option>
+              <option value="entrepreneur">Entrepreneurs & Business Owners</option>
+              <option value="everyone">General Audience (Everyone)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>What Should Users Learn? <span class="required">*</span></label>
+            <textarea id="learning-objectives" placeholder="Describe what users will learn and be able to do after completing this lesson. Be specific about the skills, features, and outcomes.
+
+Example: Users will learn how to use Lovable to build a complete habit tracker app with user authentication, database storage, and deployment - all without writing code."></textarea>
+            <div class="hint">Be specific about features, skills, and the project they'll build</div>
+          </div>
+
+          <div class="form-group">
+            <label>Project to Build (Hands-On)</label>
+            <input type="text" id="project-name" placeholder="e.g., Habit Tracker App, Invoice Generator, Portfolio Website">
+            <div class="hint">The practical project users will build during the lesson</div>
+          </div>
+
+          <div class="form-group">
+            <label>Additional Details & Requirements</label>
+            <textarea id="additional-details" placeholder="Add any specific requirements, features to cover, integrations to include, or special instructions for the lesson content.
+
+Example:
+- Include Supabase authentication setup
+- Cover mobile responsive design
+- Show how to deploy to production
+- Include debugging strategies"></textarea>
+          </div>
+        </div>
+
+        <div class="template-info">
+          <h4>MyAIcademy Presentation Template</h4>
+          <ul>
+            <li>Minimum 28 slides following the standard format</li>
+            <li>Step-by-step hands-on instructions</li>
+            <li>Screenshot placeholders for each step</li>
+            <li>PRO TIP and HANDS-ON action boxes</li>
+            <li>Companion documentation for users</li>
+          </ul>
+        </div>
+
+        <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 12px; border-radius: 0 6px 6px 0; margin-bottom: 20px; font-size: 13px;">
+          <strong>Powered by Claude Opus</strong><br>
+          Requires ANTHROPIC_API_KEY to be set in the environment where the API server runs.
+        </div>
+
+        <button class="btn btn-primary" id="generate-btn" onclick="generateLesson()">
+          <span id="btn-text">Generate Lesson with Claude Opus</span>
+          <span id="btn-spinner" style="display: none;">
+            <span class="spinner" style="width: 16px; height: 16px; border-width: 2px;"></span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Preview Panel -->
+      <div class="preview-panel">
+        <div class="preview-header">
+          <h3>Lesson Preview</h3>
+          <div class="preview-actions" id="preview-actions" style="display: none;">
+            <button class="btn btn-outline" onclick="downloadPPT()">Download PPT</button>
+            <button class="btn btn-outline" onclick="downloadInstructions()" style="background: #028090; color: white; border-color: #028090;">Download Instructions</button>
+          </div>
+        </div>
+        <div class="preview-content" id="preview-content">
+          <div class="preview-placeholder">
+            <div class="icon">📑</div>
+            <h3>Lesson Preview</h3>
+            <p>Fill in the form and click "Generate Lesson"<br>to create your presentation and documentation</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API_BASE = 'http://localhost:3001/api';
+    let generatedLesson = null;
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function validateForm() {
+      const title = document.getElementById('lesson-title').value.trim();
+      const provider = document.getElementById('provider-select').value;
+      const level = document.getElementById('level-select').value;
+      const audience = document.getElementById('audience-select').value;
+      const objectives = document.getElementById('learning-objectives').value.trim();
+
+      if (!title) {
+        showToast('Please enter a lesson title');
+        return false;
+      }
+      if (!provider) {
+        showToast('Please select an AI provider/tool');
+        return false;
+      }
+      if (!level) {
+        showToast('Please select a level');
+        return false;
+      }
+      if (!audience) {
+        showToast('Please select a target audience');
+        return false;
+      }
+      if (!objectives) {
+        showToast('Please describe what users should learn');
+        return false;
+      }
+      return true;
+    }
+
+    async function generateLesson() {
+      if (!validateForm()) return;
+
+      const btn = document.getElementById('generate-btn');
+      const btnText = document.getElementById('btn-text');
+      const btnSpinner = document.getElementById('btn-spinner');
+      const preview = document.getElementById('preview-content');
+
+      // Show loading state
+      btn.disabled = true;
+      btnText.textContent = 'Generating with Claude Opus...';
+      btnSpinner.style.display = 'inline-flex';
+
+      preview.innerHTML = `
+        <div class="loading">
+          <div class="spinner"></div>
+          <div class="loading-text">Generating lesson content with Claude Opus...</div>
+          <div class="loading-text" style="font-size: 12px; color: #999; margin-top: 10px;">This may take 1-2 minutes for a complete 28+ slide presentation</div>
+        </div>
+      `;
+
+      const lessonData = {
+        title: document.getElementById('lesson-title').value.trim(),
+        provider: document.getElementById('provider-select').value,
+        level: document.getElementById('level-select').value,
+        audience: document.getElementById('audience-select').value,
+        objectives: document.getElementById('learning-objectives').value.trim(),
+        project: document.getElementById('project-name').value.trim(),
+        additionalDetails: document.getElementById('additional-details').value.trim()
+      };
+
+      try {
+        const response = await fetch(`${API_BASE}/lessons/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(lessonData)
+        });
+
+        const result = await response.json();
+
+        if (result.error) {
+          throw new Error(result.error.message || 'Failed to generate lesson');
+        }
+
+        generatedLesson = result.data;
+        renderPreview(generatedLesson);
+        document.getElementById('preview-actions').style.display = 'flex';
+        showToast('Lesson generated successfully!');
+
+      } catch (error) {
+        console.error('Error generating lesson:', error);
+        preview.innerHTML = `
+          <div class="preview-placeholder">
+            <div class="icon" style="color: #dc3545;">!</div>
+            <h3>Generation Failed</h3>
+            <p>${error.message}</p>
+            <button class="btn btn-outline" style="margin-top: 15px;" onclick="generateLesson()">Try Again</button>
+          </div>
+        `;
+        showToast('Failed to generate lesson');
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = 'Generate Lesson with Claude Opus';
+        btnSpinner.style.display = 'none';
+      }
+    }
+
+    function renderPreview(lesson) {
+      const preview = document.getElementById('preview-content');
+      const meta = lesson.metadata || {};
+
+      let html = `
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #667eea; margin-bottom: 5px;">${lesson.title}</h3>
+          <p style="font-size: 13px; color: #666;">${lesson.slides?.length || 0} slides | ${meta.level || 'N/A'} | ${meta.audience || 'N/A'}</p>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 100%;"></div>
+        </div>
+      `;
+
+      // Render slide previews
+      if (lesson.slides) {
+        lesson.slides.forEach((slide) => {
+          const slideNum = slide.slideNumber || '';
+          const hasScreenshot = !!slide.screenshotPlaceholder;
+
+          html += `
+            <div class="slide-preview">
+              <div class="slide-header">
+                <span class="slide-number">Slide ${slideNum}</span>
+                <span>${slide.type || 'Content'}</span>
+              </div>
+              <div class="slide-body">
+                <div class="slide-title">${slide.header || 'Untitled'}</div>
+                <div class="slide-content">${formatContent(slide.content || '')}</div>
+                ${hasScreenshot ? `
+                  <div class="slide-screenshot-placeholder">
+                    [Screenshot Placeholder]<br>
+                    <small>${slide.screenshotPlaceholder}</small>
+                  </div>
+                ` : ''}
+                ${slide.specialBoxes && slide.specialBoxes.length > 0 ? renderSpecialBoxes(slide.specialBoxes) : ''}
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      // Add documentation preview
+      const stepSlides = (lesson.slides || []).filter(s => s.type === 'step').length;
+      html += `
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e1e5eb;">
+          <h4 style="margin-bottom: 15px;">Step-by-Step Companion Documentation</h4>
+          <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; font-size: 13px;">
+            <p><strong>Document includes:</strong></p>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+              <li>${stepSlides} detailed step-by-step instructions</li>
+              <li>Screenshot placeholders for each step</li>
+              <li>Copy-paste prompts and code snippets</li>
+              <li>Pro tips and common mistakes</li>
+            </ul>
+            ${lesson.companionDoc ? `
+              <details style="margin-top: 15px;">
+                <summary style="cursor: pointer; color: #667eea; font-weight: 600;">Preview Documentation</summary>
+                <pre style="background: #1a1a2e; color: #e1e5eb; padding: 15px; border-radius: 6px; margin-top: 10px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; font-size: 12px;">${escapeHtml(lesson.companionDoc)}</pre>
+              </details>
+            ` : ''}
+          </div>
+        </div>
+      `;
+
+      preview.innerHTML = html;
+    }
+
+    function formatContent(content) {
+      // Simple markdown-like formatting
+      return content
+        .replace(/\n/g, '<br>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>');
+    }
+
+    function renderSpecialBoxes(boxes) {
+      return boxes.map(box => {
+        const boxStyles = {
+          'prompt': 'background: #1a1a2e; color: #e1e5eb; border-left: 4px solid #667eea;',
+          'tip': 'background: #fff3cd; color: #856404; border-left: 4px solid #ffc107;',
+          'action': 'background: #d4edda; color: #155724; border-left: 4px solid #28a745;'
+        };
+        const labels = {
+          'prompt': 'COPY THIS PROMPT',
+          'tip': 'PRO TIP',
+          'action': 'HANDS-ON'
+        };
+        const style = boxStyles[box.type] || boxStyles['tip'];
+        const label = labels[box.type] || box.type.toUpperCase();
+
+        return `
+          <div style="${style} padding: 10px; margin-top: 10px; border-radius: 4px; font-size: 12px;">
+            <strong>${label}:</strong><br>
+            ${escapeHtml(box.content)}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    async function downloadPPT() {
+      if (!generatedLesson) {
+        showToast('No lesson generated yet');
+        return;
+      }
+
+      showToast('Generating PowerPoint file...');
+
+      try {
+        const response = await fetch(`${API_BASE}/lessons/download-pptx`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lessonData: generatedLesson })
+        });
+
+        const result = await response.json();
+
+        if (result.error) {
+          throw new Error(result.error.message);
+        }
+
+        // Convert base64 to blob and download
+        const byteCharacters = atob(result.data.content);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: result.data.contentType });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = result.data.filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showToast('PowerPoint downloaded successfully!');
+      } catch (error) {
+        console.error('Error downloading PPT:', error);
+        showToast('Failed to generate PowerPoint: ' + error.message);
+      }
+    }
+
+    function downloadDoc() {
+      if (!generatedLesson) {
+        showToast('No lesson generated yet');
+        return;
+      }
+
+      const docContent = generateDocContent(generatedLesson);
+      downloadFile(docContent, `${generatedLesson.title.replace(/\s+/g, '_')}_guide.md`, 'text/markdown');
+      showToast('Step-by-step guide downloaded');
+    }
+
+    function downloadInstructions() {
+      if (!generatedLesson) {
+        showToast('No lesson generated yet');
+        return;
+      }
+
+      showToast('Generating PDF instructions...');
+      generateInstructionsPDF(generatedLesson);
+    }
+
+    function generateInstructionsPDF(lesson) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const meta = lesson.metadata || {};
+
+      // Colors (Teal Trust Theme)
+      const TEAL = [2, 128, 144];       // #028090
+      const DARK_NAVY = [30, 39, 97];   // #1E2761
+      const GREEN = [40, 167, 69];      // #28A745
+      const YELLOW_BG = [254, 243, 205]; // #FEF3CD
+      const RED = [220, 53, 69];        // #DC3545
+      const GRAY = [55, 65, 81];        // #374151
+
+      let yPos = 20;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 20;
+      const contentWidth = pageWidth - (margin * 2);
+
+      // Helper function to check page break
+      function checkPageBreak(requiredSpace) {
+        if (yPos + requiredSpace > pageHeight - 30) {
+          doc.addPage();
+          yPos = 20;
+          return true;
+        }
+        return false;
+      }
+
+      // Helper function to add wrapped text
+      function addWrappedText(text, x, y, maxWidth, lineHeight) {
+        const lines = doc.splitTextToSize(text, maxWidth);
+        lines.forEach((line, i) => {
+          checkPageBreak(lineHeight);
+          doc.text(line, x, yPos);
+          yPos += lineHeight;
+        });
+        return yPos;
+      }
+
+      // Title Page
+      doc.setFillColor(...TEAL);
+      doc.rect(0, 0, pageWidth, 60, 'F');
+
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(24);
+      doc.setFont('helvetica', 'bold');
+      doc.text(lesson.title || 'Lesson', margin, 35);
+
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'normal');
+      doc.text('BUILD INSTRUCTIONS - Follow Along Guide', margin, 48);
+
+      yPos = 80;
+
+      // Overview Box
+      doc.setFillColor(245, 247, 250);
+      doc.roundedRect(margin, yPos, contentWidth, 45, 3, 3, 'F');
+
+      doc.setTextColor(...DARK_NAVY);
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Overview', margin + 5, yPos + 12);
+
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...GRAY);
+      doc.text('Tool/Platform: ' + (meta.provider || 'N/A'), margin + 5, yPos + 24);
+      doc.text('Difficulty Level: ' + (meta.level || 'N/A'), margin + 5, yPos + 32);
+      doc.text('Target Audience: ' + (meta.audience || 'N/A'), margin + 5, yPos + 40);
+
+      yPos += 55;
+
+      // How to Use Section
+      doc.setTextColor(...TEAL);
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('How to Use This Document', margin, yPos);
+      yPos += 10;
+
+      doc.setTextColor(...GRAY);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      const howToUse = [
+        '1. Read each step carefully before performing the action',
+        '2. Follow the instructions exactly as written',
+        '3. Take a screenshot after completing each step (as indicated)',
+        '4. Paste screenshots into the corresponding PowerPoint slide',
+        '5. Use the prompts provided - copy and paste them exactly'
+      ];
+      howToUse.forEach(item => {
+        doc.text(item, margin, yPos);
+        yPos += 6;
+      });
+
+      yPos += 10;
+
+      // Tip box
+      doc.setFillColor(...YELLOW_BG);
+      doc.roundedRect(margin, yPos, contentWidth, 15, 2, 2, 'F');
+      doc.setTextColor(133, 100, 4);
+      doc.setFontSize(9);
+      doc.text('TIP: Keep this document open alongside the tool. Complete one step at a time.', margin + 5, yPos + 10);
+
+      yPos += 25;
+
+      // Steps
+      const stepSlides = (lesson.slides || []).filter(s => s.type === 'step' || s.type === 'screenshot');
+      let stepCounter = 0;
+      let figureCounter = 1;
+
+      stepSlides.forEach((slide) => {
+        if (slide.type === 'step') {
+          stepCounter++;
+
+          checkPageBreak(60);
+
+          // Step header with teal background
+          doc.setFillColor(...TEAL);
+          doc.roundedRect(margin, yPos, contentWidth, 12, 2, 2, 'F');
+          doc.setTextColor(255, 255, 255);
+          doc.setFontSize(12);
+          doc.setFont('helvetica', 'bold');
+          doc.text('STEP ' + stepCounter + ': ' + (slide.header || ''), margin + 5, yPos + 8);
+          yPos += 18;
+
+          // Instructions
+          if (slide.content) {
+            doc.setTextColor(...GRAY);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            addWrappedText(slide.content, margin, yPos, contentWidth, 5);
+            yPos += 5;
+          }
+
+          // Features/sub-steps
+          if (slide.features && slide.features.length > 0) {
+            checkPageBreak(30);
+            doc.setTextColor(...DARK_NAVY);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('What to do:', margin, yPos);
+            yPos += 6;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(...GRAY);
+            slide.features.forEach((feature, idx) => {
+              checkPageBreak(12);
+              const label = feature.label || feature.title || 'Action ' + (idx + 1);
+              const desc = feature.desc || feature.description || '';
+              doc.setFont('helvetica', 'bold');
+              doc.text((idx + 1) + '. ' + label, margin + 5, yPos);
+              yPos += 5;
+              if (desc) {
+                doc.setFont('helvetica', 'normal');
+                addWrappedText(desc, margin + 10, yPos, contentWidth - 15, 4);
+              }
+              yPos += 3;
+            });
+          }
+
+          // Prompt box (dark navy)
+          const promptBox = slide.specialBoxes?.find(b => b.type === 'prompt');
+          if (promptBox) {
+            checkPageBreak(35);
+            doc.setFillColor(...DARK_NAVY);
+            const promptLines = doc.splitTextToSize(promptBox.content, contentWidth - 15);
+            const boxHeight = Math.max(25, promptLines.length * 5 + 15);
+            doc.roundedRect(margin, yPos, contentWidth, boxHeight, 2, 2, 'F');
+
+            doc.setTextColor(...TEAL);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text('COPY THIS PROMPT:', margin + 5, yPos + 8);
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(9);
+            doc.setFont('courier', 'normal');
+            promptLines.forEach((line, i) => {
+              doc.text(line, margin + 5, yPos + 15 + (i * 5));
+            });
+            yPos += boxHeight + 5;
+          }
+
+          // Pro tip (yellow)
+          const tipBox = slide.specialBoxes?.find(b => b.type === 'tip');
+          if (tipBox) {
+            checkPageBreak(20);
+            doc.setFillColor(...YELLOW_BG);
+            const tipLines = doc.splitTextToSize(tipBox.content, contentWidth - 30);
+            const boxHeight = tipLines.length * 4 + 10;
+            doc.roundedRect(margin, yPos, contentWidth, boxHeight, 2, 2, 'F');
+            doc.setTextColor(133, 100, 4);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text('PRO TIP: ', margin + 5, yPos + 7);
+            doc.setFont('helvetica', 'normal');
+            tipLines.forEach((line, i) => {
+              doc.text(line, margin + 25, yPos + 7 + (i * 4));
+            });
+            yPos += boxHeight + 5;
+          }
+
+          // Action box (green)
+          const actionBox = slide.specialBoxes?.find(b => b.type === 'action');
+          if (actionBox) {
+            checkPageBreak(15);
+            doc.setFillColor(212, 237, 218);
+            doc.roundedRect(margin, yPos, contentWidth, 12, 2, 2, 'F');
+            doc.setTextColor(...GREEN);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text('YOUR ACTION: ' + actionBox.content, margin + 5, yPos + 8);
+            yPos += 17;
+          }
+        }
+
+        // Screenshot placeholder
+        if (slide.type === 'screenshot' || slide.screenshotPlaceholder) {
+          checkPageBreak(50);
+
+          doc.setFillColor(248, 249, 250);
+          doc.setDrawColor(200, 200, 200);
+          doc.roundedRect(margin, yPos, contentWidth, 40, 2, 2, 'FD');
+
+          doc.setTextColor(...TEAL);
+          doc.setFontSize(10);
+          doc.setFont('helvetica', 'bold');
+          doc.text('SCREENSHOT ' + figureCounter, margin + 5, yPos + 10);
+
+          doc.setTextColor(...GRAY);
+          doc.setFontSize(9);
+          doc.setFont('helvetica', 'normal');
+          const screenshotDesc = slide.screenshotPlaceholder || slide.header || 'Take a screenshot';
+          const descLines = doc.splitTextToSize('What to capture: ' + screenshotDesc, contentWidth - 10);
+          descLines.forEach((line, i) => {
+            doc.text(line, margin + 5, yPos + 18 + (i * 4));
+          });
+
+          doc.setTextColor(150, 150, 150);
+          doc.setFontSize(8);
+          doc.text('[ Paste screenshot here - Slide ' + (slide.slideNumber || figureCounter + 2) + ' ]', pageWidth / 2, yPos + 35, { align: 'center' });
+
+          figureCounter++;
+          yPos += 48;
+        }
+
+        yPos += 5;
+      });
+
+      // Tips section
+      const tipsSlide = (lesson.slides || []).find(s => s.type === 'tips');
+      if (tipsSlide) {
+        checkPageBreak(40);
+        doc.setFillColor(...TEAL);
+        doc.roundedRect(margin, yPos, contentWidth, 10, 2, 2, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text('PRO TIPS FOR SUCCESS', margin + 5, yPos + 7);
+        yPos += 15;
+
+        if (tipsSlide.tips && tipsSlide.tips.length > 0) {
+          tipsSlide.tips.forEach((tip, idx) => {
+            checkPageBreak(15);
+            doc.setTextColor(...DARK_NAVY);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text((idx + 1) + '. ' + (tip.title || 'Tip'), margin, yPos);
+            yPos += 5;
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(...GRAY);
+            addWrappedText(tip.desc || tip.content || '', margin + 5, yPos, contentWidth - 10, 4);
+            yPos += 3;
+          });
+        }
+        yPos += 10;
+      }
+
+      // Mistakes section
+      const mistakesSlide = (lesson.slides || []).find(s => s.type === 'mistakes');
+      if (mistakesSlide) {
+        checkPageBreak(40);
+        doc.setFillColor(...RED);
+        doc.roundedRect(margin, yPos, contentWidth, 10, 2, 2, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text('COMMON MISTAKES TO AVOID', margin + 5, yPos + 7);
+        yPos += 15;
+
+        if (mistakesSlide.mistakes && mistakesSlide.mistakes.length > 0) {
+          mistakesSlide.mistakes.forEach((mistake) => {
+            checkPageBreak(18);
+            doc.setTextColor(...RED);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text('X Don\'t: ', margin, yPos);
+            doc.setFont('helvetica', 'normal');
+            doc.text(mistake.wrong || '', margin + 18, yPos);
+            yPos += 5;
+            doc.setTextColor(...GREEN);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Do: ', margin, yPos);
+            doc.setFont('helvetica', 'normal');
+            doc.text(mistake.right || '', margin + 10, yPos);
+            yPos += 8;
+          });
+        }
+        yPos += 10;
+      }
+
+      // Completion Checklist
+      checkPageBreak(50);
+      doc.setFillColor(212, 237, 218);
+      doc.roundedRect(margin, yPos, contentWidth, 45, 3, 3, 'F');
+
+      doc.setTextColor(...GREEN);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('COMPLETION CHECKLIST', margin + 5, yPos + 10);
+
+      doc.setTextColor(...GRAY);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      const checklist = [
+        'Completed all ' + stepCounter + ' steps',
+        'Took screenshots for each step',
+        'Pasted screenshots into PowerPoint slides',
+        'Reviewed the final presentation',
+        '(Optional) Completed the challenge'
+      ];
+      checklist.forEach((item, i) => {
+        doc.rect(margin + 5, yPos + 15 + (i * 6), 3, 3);
+        doc.text(item, margin + 12, yPos + 18 + (i * 6));
+      });
+
+      // Footer on last page
+      doc.setTextColor(150, 150, 150);
+      doc.setFontSize(8);
+      doc.text('Generated by MyAIcademy Curriculum Engine', pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+      // Save the PDF
+      const filename = (lesson.title || 'lesson').replace(/[^a-zA-Z0-9]/g, '_') + '_BUILD_INSTRUCTIONS.pdf';
+      doc.save(filename);
+      showToast('PDF instructions downloaded!');
+    }
+
+    function generatePPTContent(lesson) {
+      const meta = lesson.metadata || {};
+      let content = `# ${lesson.title}\n\n`;
+      content += `**Provider:** ${meta.provider || 'N/A'} | **Level:** ${meta.level || 'N/A'} | **Audience:** ${meta.audience || 'N/A'}\n\n`;
+      content += `---\n\n`;
+
+      if (lesson.slides) {
+        lesson.slides.forEach((slide) => {
+          content += `## Slide ${slide.slideNumber}: ${slide.header}\n\n`;
+          if (slide.type) content += `*Type: ${slide.type}*\n\n`;
+          content += `${slide.content}\n\n`;
+          if (slide.screenshotPlaceholder) {
+            content += `**[SCREENSHOT PLACEHOLDER]**\n`;
+            content += `*${slide.screenshotPlaceholder}*\n\n`;
+          }
+          if (slide.specialBoxes && slide.specialBoxes.length > 0) {
+            slide.specialBoxes.forEach(box => {
+              if (box.type === 'prompt') {
+                content += `**COPY THIS PROMPT:**\n\`\`\`\n${box.content}\n\`\`\`\n\n`;
+              } else if (box.type === 'tip') {
+                content += `> **PRO TIP:** ${box.content}\n\n`;
+              } else if (box.type === 'action') {
+                content += `**HANDS-ON:** ${box.content}\n\n`;
+              }
+            });
+          }
+          content += `---\n\n`;
+        });
+      }
+
+      return content;
+    }
+
+    function generateDocContent(lesson) {
+      // If the API returned a companion doc, use it directly
+      if (lesson.companionDoc) {
+        return lesson.companionDoc;
+      }
+
+      // Otherwise, generate from slides
+      const meta = lesson.metadata || {};
+      let content = `# ${lesson.title}\n`;
+      content += `## Step-by-Step Guide\n\n`;
+      content += `**Provider:** ${meta.provider || 'N/A'}\n`;
+      content += `**Level:** ${meta.level || 'N/A'}\n`;
+      content += `**Audience:** ${meta.audience || 'N/A'}\n\n`;
+      content += `---\n\n`;
+
+      // Extract step slides for the guide
+      const stepSlides = (lesson.slides || []).filter(s => s.type === 'step');
+      stepSlides.forEach((slide, index) => {
+        content += `### Step ${index + 1}: ${slide.header}\n\n`;
+        content += `${slide.content}\n\n`;
+
+        // Add special boxes content
+        if (slide.specialBoxes) {
+          slide.specialBoxes.forEach(box => {
+            if (box.type === 'prompt') {
+              content += `**Prompt to use:**\n\`\`\`\n${box.content}\n\`\`\`\n\n`;
+            } else if (box.type === 'tip') {
+              content += `> **Tip:** ${box.content}\n\n`;
+            }
+          });
+        }
+
+        if (slide.screenshotPlaceholder) {
+          content += `**[PASTE YOUR SCREENSHOT HERE]**\n`;
+          content += `*${slide.screenshotPlaceholder}*\n\n`;
+        }
+
+        content += `---\n\n`;
+      });
+
+      return content;
+    }
+
+    function downloadFile(content, filename, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

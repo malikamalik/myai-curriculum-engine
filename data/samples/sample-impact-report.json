@@ -1,0 +1,35 @@
+{
+  "id": "sample-report-001",
+  "update_id": "sample-update-001",
+  "provider": "OpenAI",
+  "severity": "high",
+  "recommended_action": "update_lesson",
+  "affected_lessons": [
+    {
+      "lesson_id": "lesson-prompt-like-a-pro",
+      "lesson_title": "Prompt Like a Pro",
+      "relevance_score": 0.85,
+      "suggested_changes": "Consider adding new content about GPT-4o's enhanced reasoning capabilities to 'Prompt Like a Pro' - this feature should be covered as it changes prompting best practices."
+    },
+    {
+      "lesson_id": "lesson-chatgpt-agents",
+      "lesson_title": "Building AI Agents with ChatGPT in Under 10 Minutes",
+      "relevance_score": 0.72,
+      "suggested_changes": "Review 'Building AI Agents with ChatGPT' and consider mentioning: GPT-4o enhanced reasoning capabilities for better agent workflows."
+    }
+  ],
+  "mapping_suggestions": [],
+  "rationale": "Update from OpenAI: \"GPT-4o with Enhanced Reasoning Capabilities\" This update introduces significant new features that should be covered in the curriculum. 2 lesson(s) may be affected, with the most relevant being \"Prompt Like a Pro\".",
+  "citations": [
+    {
+      "text": "GPT-4o with Enhanced Reasoning Capabilities",
+      "url": "https://openai.com/blog/gpt-4o-reasoning-update"
+    }
+  ],
+  "status": "new",
+  "assignee": null,
+  "created_at": "2024-01-15T12:05:00.000Z",
+  "updated_at": "2024-01-15T12:05:00.000Z",
+  "reviewed_by": null,
+  "reviewed_at": null
+}
