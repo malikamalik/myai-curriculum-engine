@@ -21,7 +21,7 @@
     },
     {
       "src": "^/$",
-      "dest": "/public/lesson-builder.html"
+      "dest": "/public/index.html"
     },
     {
       "src": "/(.*)",
