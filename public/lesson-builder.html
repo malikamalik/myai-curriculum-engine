@@ -569,7 +569,7 @@ Example:
         </div>
 
         <button class="btn btn-primary" id="generate-btn" onclick="generateLesson()">
-          <span id="btn-text">Generate Lesson with Claude Opus</span>
+          <span id="btn-text">Generate Lesson</span>
           <span id="btn-spinner" style="display: none;">
             <span class="spinner" style="width: 16px; height: 16px; border-width: 2px;"></span>
           </span>
@@ -650,13 +650,13 @@ Example:
 
       // Show loading state
       btn.disabled = true;
-      btnText.textContent = 'Generating with Claude Opus...';
+      btnText.textContent = 'Generating...';
       btnSpinner.style.display = 'inline-flex';
 
       preview.innerHTML = `
         <div class="loading">
           <div class="spinner"></div>
-          <div class="loading-text">Generating lesson content with Claude Opus...</div>
+          <div class="loading-text">Generating lesson content...</div>
           <div class="loading-text" style="font-size: 12px; color: #999; margin-top: 10px;">This may take 1-2 minutes for a complete 28+ slide presentation</div>
         </div>
       `;
@@ -702,7 +702,7 @@ Example:
         showToast('Failed to generate lesson');
       } finally {
         btn.disabled = false;
-        btnText.textContent = 'Generate Lesson with Claude Opus';
+        btnText.textContent = 'Generate Lesson';
         btnSpinner.style.display = 'none';
       }
     }
