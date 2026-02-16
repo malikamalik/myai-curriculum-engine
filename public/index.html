@@ -724,6 +724,289 @@
       font-size: 13px;
       color: #1565c0;
     }
+
+    /* Course Generation - matching lesson-builder design system */
+    .btn-generate {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-weight: 600;
+    }
+
+    .btn-generate:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn-generate:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-generate-sm {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-size: 11px;
+      padding: 5px 10px;
+      font-weight: 600;
+    }
+
+    .btn-generate-sm:hover {
+      opacity: 0.9;
+    }
+
+    .approved-reports-section {
+      margin-bottom: 25px;
+    }
+
+    .approved-reports-section h3 {
+      font-size: 16px;
+      color: #667eea;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .approved-reports-section h3 .count {
+      background: #667eea;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+
+    .report-card.approved {
+      border-left: 4px solid #667eea;
+      background: #f0f4ff;
+    }
+
+    /* Generation Modal */
+    .gen-modal .modal-content {
+      max-width: 800px;
+    }
+
+    .gen-progress {
+      margin: 20px 0;
+    }
+
+    .gen-progress-bar {
+      height: 4px;
+      background: #e1e5eb;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .gen-progress-fill {
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    .gen-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e1e5eb;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: genSpin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes genSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    .gen-status {
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+    }
+
+    .gen-status.active {
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .gen-substatus {
+      font-size: 12px;
+      color: #999;
+      text-align: center;
+      margin-top: 5px;
+    }
+
+    .gen-report-list {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+    }
+
+    .gen-report-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 2px solid #e1e5eb;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .gen-report-item:hover {
+      border-color: #667eea;
+    }
+
+    .gen-report-item.selected {
+      border-color: #667eea;
+      background: #f0f4ff;
+    }
+
+    .gen-report-item input[type="checkbox"] {
+      flex-shrink: 0;
+    }
+
+    .gen-report-item .provider {
+      font-weight: 600;
+      min-width: 100px;
+    }
+
+    /* Course Preview - lesson-builder slide style */
+    .course-preview {
+      margin-top: 20px;
+    }
+
+    .course-preview-header {
+      background: #1a1a2e;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px 8px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .course-preview-header h3 {
+      font-size: 16px;
+      color: white;
+      margin: 0;
+    }
+
+    .course-preview-body {
+      background: white;
+      border: 1px solid #e1e5eb;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      padding: 20px;
+    }
+
+    .course-preview-meta {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .course-preview-desc {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #e1e5eb;
+    }
+
+    .preview-lesson {
+      background: white;
+      border: 1px solid #e1e5eb;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .preview-lesson-header {
+      background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+      color: white;
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .preview-lesson-number {
+      background: #20b2aa;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .preview-lesson-body {
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .preview-lesson-info {
+      flex: 1;
+    }
+
+    .preview-lesson-title {
+      font-weight: 600;
+      font-size: 16px;
+      color: #20b2aa;
+      margin-bottom: 5px;
+    }
+
+    .preview-lesson-meta {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .preview-lesson-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .preview-lesson-actions .btn-outline {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .preview-lesson-actions .btn-download {
+      padding: 6px 12px;
+      font-size: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .preview-lesson-actions .btn-download:hover {
+      opacity: 0.9;
+    }
+
+    /* Template info box matching lesson-builder */
+    .gen-template-info {
+      background: #e8f5e9;
+      border-left: 4px solid #28a745;
+      padding: 12px 15px;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 15px;
+      font-size: 13px;
+      color: #1b5e20;
+    }
+
+    .gen-template-info strong {
+      color: #2e7d32;
+    }
   </style>
 </head>
 <body>
@@ -832,7 +1115,22 @@
     <div class="section">
       <div class="section-header">
         <h2>Curriculum Recommendations</h2>
-        <button class="btn-outline btn-small" onclick="analyzeUpdates()">Analyze New Updates</button>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-generate btn-small" onclick="openGenerateModal()">Generate AI Course</button>
+          <button class="btn-outline btn-small" onclick="analyzeUpdates()">Analyze New Updates</button>
+        </div>
+      </div>
+
+      <!-- Ready for Course Generation (Approved Reports) -->
+      <div class="recommendation-section approved-reports-section" id="approved-reports-section" style="display: none;">
+        <h3>
+          Ready for Course Generation
+          <span class="count" id="approved-report-count">0</span>
+        </h3>
+        <p style="font-size: 13px; color: #666; margin-bottom: 15px;">
+          These approved reports can be used to auto-generate a full AI course with lessons.
+        </p>
+        <div id="approved-report-cards"></div>
       </div>
 
       <!-- Update Existing Lessons -->
@@ -954,6 +1252,55 @@
         </div>
         <button type="submit" class="btn-primary">Save</button>
       </form>
+    </div>
+  </div>
+
+  <!-- Course Generation Modal -->
+  <div class="modal gen-modal" id="generate-modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeGenerateModal()">&times;</span>
+      <h3 id="gen-modal-title">Generate AI Course</h3>
+
+      <!-- Step 1: Report Selection -->
+      <div id="gen-step-select">
+        <div class="gen-template-info">
+          <strong>Course Generation</strong> uses AI to analyze approved impact reports and create a complete course with 3-6 lessons, each containing 29 presentation slides with hands-on exercises.
+        </div>
+        <div style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <label style="font-size: 13px; cursor: pointer;">
+            <input type="checkbox" id="gen-select-all" onchange="toggleSelectAllReports()" checked> Select All Reports
+          </label>
+          <span style="font-size: 12px; color: #666;" id="gen-selected-count"></span>
+        </div>
+        <div class="gen-report-list" id="gen-report-list"></div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button class="btn-secondary" style="padding: 10px 20px;" onclick="closeGenerateModal()">Cancel</button>
+          <button class="btn-generate" style="padding: 10px 24px;" id="gen-start-btn" onclick="startGeneration()">Generate Course</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Progress -->
+      <div id="gen-step-progress" style="display: none;">
+        <div style="padding: 30px 0; text-align: center;">
+          <div class="gen-spinner"></div>
+          <div class="gen-status active" id="gen-status-text">Initializing course generation...</div>
+          <div class="gen-substatus" id="gen-substatus">This may take 2-5 minutes for a complete multi-lesson course</div>
+        </div>
+        <div class="gen-progress">
+          <div class="gen-progress-bar">
+            <div class="gen-progress-fill" id="gen-progress-fill"></div>
+          </div>
+        </div>
+        <div id="gen-progress-log" style="background: #1a1a2e; color: #e1e5eb; font-family: monospace; font-size: 12px; padding: 15px; border-radius: 8px; max-height: 150px; overflow-y: auto; margin-top: 15px;"></div>
+      </div>
+
+      <!-- Step 3: Course Preview -->
+      <div id="gen-step-preview" style="display: none;">
+        <div class="course-preview" id="gen-course-preview"></div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button class="btn-secondary" style="padding: 10px 20px;" onclick="closeGenerateModal()">Close</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1533,11 +1880,402 @@
       }
     }
 
+    // Utility: escape HTML for safe rendering
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ============================================
+    // COURSE GENERATION
+    // ============================================
+
+    let approvedReports = [];
+
+    // Load approved reports
+    async function loadApprovedReports() {
+      try {
+        const res = await fetch(`${API_BASE}/impact-reports?status=approved`);
+        const { data } = await res.json();
+        approvedReports = data;
+        renderApprovedReports();
+      } catch (err) {
+        console.error('Error loading approved reports:', err);
+      }
+    }
+
+    function renderApprovedReports() {
+      const section = document.getElementById('approved-reports-section');
+      const container = document.getElementById('approved-report-cards');
+      const countBadge = document.getElementById('approved-report-count');
+
+      if (approvedReports.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+
+      section.style.display = 'block';
+      countBadge.textContent = approvedReports.length;
+
+      container.innerHTML = approvedReports.map(report => `
+        <div class="report-card approved">
+          <div class="report-header">
+            <div class="report-provider">${report.provider}</div>
+            <div class="report-meta">
+              <span class="badge badge-${report.severity}">${report.severity}</span>
+              <span class="badge badge-approved">approved</span>
+            </div>
+          </div>
+          <div class="report-rationale">${report.rationale}</div>
+          ${report.citations && report.citations.length > 0 ? `
+            <div class="report-citations">
+              <h5>Source Documentation</h5>
+              ${report.citations.map(c => `<a href="${c.url}" target="_blank">${c.text}</a>`).join('')}
+            </div>
+          ` : ''}
+          <div class="report-actions">
+            <button class="btn-generate-sm" onclick="openGenerateModal(['${report.id}'])">Generate Course</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Modal management
+    function openGenerateModal(preselectedIds) {
+      if (approvedReports.length === 0) {
+        showToast('No approved reports available. Approve some impact reports first.');
+        return;
+      }
+
+      // Reset modal state
+      document.getElementById('gen-step-select').style.display = 'block';
+      document.getElementById('gen-step-progress').style.display = 'none';
+      document.getElementById('gen-step-preview').style.display = 'none';
+      document.getElementById('gen-modal-title').textContent = 'Generate AI Course';
+      document.getElementById('gen-start-btn').disabled = false;
+
+      // Populate report list
+      const listContainer = document.getElementById('gen-report-list');
+      listContainer.innerHTML = approvedReports.map(r => {
+        const checked = preselectedIds ? preselectedIds.includes(r.id) : true;
+        return `
+          <div class="gen-report-item ${checked ? 'selected' : ''}" onclick="toggleReportItem(this)">
+            <input type="checkbox" class="gen-report-checkbox" value="${r.id}" ${checked ? 'checked' : ''} onclick="event.stopPropagation();" onchange="updateReportItemStyle(this)">
+            <span class="provider">${r.provider}</span>
+            <span style="flex: 1; color: #666;">${r.rationale.slice(0, 80)}${r.rationale.length > 80 ? '...' : ''}</span>
+            <span class="badge badge-${r.severity}">${r.severity}</span>
+          </div>
+        `;
+      }).join('');
+
+      // Update select-all checkbox and count
+      document.getElementById('gen-select-all').checked = !preselectedIds;
+      updateSelectedCount();
+
+      document.getElementById('generate-modal').classList.add('active');
+    }
+
+    function closeGenerateModal() {
+      document.getElementById('generate-modal').classList.remove('active');
+    }
+
+    function toggleSelectAllReports() {
+      const checked = document.getElementById('gen-select-all').checked;
+      document.querySelectorAll('.gen-report-checkbox').forEach(cb => {
+        cb.checked = checked;
+        updateReportItemStyle(cb);
+      });
+    }
+
+    function getSelectedReportIds() {
+      return Array.from(document.querySelectorAll('.gen-report-checkbox:checked')).map(cb => cb.value);
+    }
+
+    function toggleReportItem(el) {
+      const cb = el.querySelector('.gen-report-checkbox');
+      cb.checked = !cb.checked;
+      updateReportItemStyle(cb);
+    }
+
+    function updateReportItemStyle(cb) {
+      const item = cb.closest('.gen-report-item');
+      if (cb.checked) {
+        item.classList.add('selected');
+      } else {
+        item.classList.remove('selected');
+      }
+      updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+      const total = document.querySelectorAll('.gen-report-checkbox').length;
+      const selected = document.querySelectorAll('.gen-report-checkbox:checked').length;
+      document.getElementById('gen-selected-count').textContent = `${selected} of ${total} selected`;
+    }
+
+    // Progress simulation and generation
+    async function startGeneration() {
+      const selectedIds = getSelectedReportIds();
+      if (selectedIds.length === 0) {
+        showToast('Select at least one approved report.');
+        return;
+      }
+
+      // Switch to progress view
+      document.getElementById('gen-step-select').style.display = 'none';
+      document.getElementById('gen-step-progress').style.display = 'block';
+      document.getElementById('gen-modal-title').textContent = 'Generating Course...';
+
+      const progressFill = document.getElementById('gen-progress-fill');
+      const statusText = document.getElementById('gen-status-text');
+      const progressLog = document.getElementById('gen-progress-log');
+      progressLog.innerHTML = '';
+
+      function logProgress(msg) {
+        const line = document.createElement('div');
+        line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        progressLog.appendChild(line);
+        progressLog.scrollTop = progressLog.scrollHeight;
+      }
+
+      // Simulate progress steps
+      const progressSteps = [
+        { pct: 5, msg: 'Collecting approved impact reports...' },
+        { pct: 10, msg: 'Grouping reports by provider...' },
+        { pct: 15, msg: 'Fetching underlying update data...' },
+        { pct: 20, msg: 'Phase 1: Designing course architecture with Claude...' },
+        { pct: 35, msg: 'Course plan received, preparing lesson generation...' },
+        { pct: 40, msg: 'Phase 2: Generating lesson 1...' },
+        { pct: 55, msg: 'Phase 2: Generating lesson 2...' },
+        { pct: 70, msg: 'Phase 2: Generating lesson 3...' },
+        { pct: 85, msg: 'Storing lessons and course in database...' },
+        { pct: 90, msg: 'Creating audit logs...' },
+        { pct: 95, msg: 'Finalizing...' }
+      ];
+
+      let stepIndex = 0;
+      const progressInterval = setInterval(() => {
+        if (stepIndex < progressSteps.length) {
+          const step = progressSteps[stepIndex];
+          progressFill.style.width = step.pct + '%';
+          statusText.textContent = step.msg;
+          logProgress(step.msg);
+          stepIndex++;
+        }
+      }, 8000);
+
+      // Actually call the API
+      try {
+        logProgress('Sending generation request to server...');
+
+        const res = await fetch(`${API_BASE}/courses/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reportIds: selectedIds })
+        });
+
+        clearInterval(progressInterval);
+
+        const result = await res.json();
+
+        if (!res.ok) {
+          throw new Error(result.error?.message || 'Generation failed');
+        }
+
+        // Complete progress
+        progressFill.style.width = '100%';
+        statusText.textContent = 'Course generated successfully!';
+        logProgress('Done!');
+
+        // Short delay then show preview
+        setTimeout(() => {
+          showCoursePreview(result.data);
+        }, 1000);
+
+      } catch (err) {
+        clearInterval(progressInterval);
+        progressFill.style.width = '0%';
+        statusText.textContent = 'Generation failed: ' + err.message;
+        statusText.classList.remove('active');
+        statusText.style.color = '#dc3545';
+        logProgress('ERROR: ' + err.message);
+        showToast('Course generation failed: ' + err.message);
+      }
+    }
+
+    function showCoursePreview(data) {
+      document.getElementById('gen-step-progress').style.display = 'none';
+      document.getElementById('gen-step-preview').style.display = 'block';
+      document.getElementById('gen-modal-title').textContent = 'Course Generated!';
+
+      const preview = document.getElementById('gen-course-preview');
+
+      preview.innerHTML = `
+        <div class="course-preview-header">
+          <h3>${data.course.name}</h3>
+          <span style="font-size: 12px; opacity: 0.7;">${data.course.lessonCount} lessons generated</span>
+        </div>
+        <div class="course-preview-body">
+          <div class="course-preview-desc">
+            ${data.course.description || ''}
+          </div>
+          <div class="course-preview-meta">
+            <span class="badge badge-approved">${data.course.track.replace('_', ' ')}</span>
+            <span class="badge badge-${data.course.level === 'advanced' ? 'critical' : data.course.level === 'intermediate' ? 'high' : 'low'}">${data.course.level}</span>
+            <span class="badge badge-info">${data.reportsProcessed} reports processed</span>
+            <span class="badge badge-info">${data.providersIncluded.join(', ')}</span>
+          </div>
+
+          ${data.lessons.map((lesson, i) => `
+            <div class="preview-lesson">
+              <div class="preview-lesson-header">
+                <span class="preview-lesson-number">Lesson ${i + 1}</span>
+                <span>${lesson.slideCount} slides | ${lesson.level}</span>
+              </div>
+              <div class="preview-lesson-body">
+                <div class="preview-lesson-info">
+                  <div class="preview-lesson-title">${lesson.title}</div>
+                  <div class="preview-lesson-meta">${lesson.provider}</div>
+                </div>
+                <div class="preview-lesson-actions">
+                  <button class="btn-outline" onclick="previewGeneratedLesson(${i})">Preview Slides</button>
+                  <button class="btn-download" onclick="downloadGeneratedPptx(${i})">Download PPTX</button>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      // Store lessons data for preview/download
+      window._generatedCourseData = data;
+
+      // Refresh all data
+      loadStats();
+      loadCourses();
+      loadApprovedReports();
+      loadReports();
+      loadAuditLogs();
+    }
+
+    function previewGeneratedLesson(index) {
+      const lesson = window._generatedCourseData?.lessons[index];
+      if (!lesson) return;
+
+      const previewWindow = window.open('', '_blank');
+      previewWindow.document.write(`
+        <!DOCTYPE html>
+        <html><head><title>Preview: ${escapeHtml(lesson.title)}</title>
+        <style>
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; line-height: 1.6; }
+          .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+          header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
+          header h1 { font-size: 24px; margin-bottom: 5px; }
+          header p { opacity: 0.9; font-size: 14px; }
+          .progress-bar { height: 4px; background: #e1e5eb; border-radius: 2px; margin-bottom: 20px; overflow: hidden; }
+          .progress-fill { height: 100%; width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 2px; }
+          .slide-preview { background: white; border: 1px solid #e1e5eb; border-radius: 8px; margin-bottom: 15px; overflow: hidden; }
+          .slide-header { background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%); color: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+          .slide-number { background: #20b2aa; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+          .slide-body { padding: 15px; min-height: 80px; }
+          .slide-title { font-size: 16px; font-weight: 600; color: #20b2aa; margin-bottom: 10px; }
+          .slide-content { font-size: 13px; color: #666; }
+          .feature-item { margin-top: 5px; font-size: 13px; }
+          .feature-item strong { color: #333; }
+          .special-box { padding: 10px; margin-top: 10px; border-radius: 4px; font-size: 12px; }
+          .box-prompt { background: #1a1a2e; color: #e1e5eb; border-left: 4px solid #667eea; font-family: monospace; }
+          .box-tip { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+          .box-action { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+          .box-warning { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+          .box-bestpractice { background: #fff3e0; color: #e65100; border-left: 4px solid #ff9800; }
+          .screenshot-placeholder { background: #f8f9fa; border: 2px dashed #ddd; border-radius: 6px; padding: 30px; text-align: center; margin-top: 10px; color: #999; font-size: 12px; }
+          .companion-doc { margin-top: 30px; padding-top: 20px; border-top: 2px solid #e1e5eb; }
+          .companion-doc h4 { margin-bottom: 15px; }
+          .doc-preview { background: #1a1a2e; color: #e1e5eb; padding: 15px; border-radius: 6px; font-size: 12px; font-family: monospace; max-height: 300px; overflow-y: auto; white-space: pre-wrap; }
+        </style></head><body>
+        <div class="container">
+          <header>
+            <h1>${escapeHtml(lesson.title)}</h1>
+            <p>${escapeHtml(lesson.provider)} | ${escapeHtml(lesson.level)} | ${lesson.slideCount} slides</p>
+          </header>
+          <div class="progress-bar"><div class="progress-fill"></div></div>
+          ${(lesson.slides || []).map((slide, si) => `
+            <div class="slide-preview">
+              <div class="slide-header">
+                <span class="slide-number">Slide ${si + 1}</span>
+                <span>${escapeHtml(slide.type || 'content')}</span>
+              </div>
+              <div class="slide-body">
+                <div class="slide-title">${escapeHtml(slide.header || '')}</div>
+                <div class="slide-content">${escapeHtml(slide.content || slide.subtitle || '')}</div>
+                ${(slide.features || []).map(f => `<div class="feature-item"><strong>${escapeHtml(f.icon || '')} ${escapeHtml(f.title || f.label || '')}</strong>: ${escapeHtml(f.desc || '')}</div>`).join('')}
+                ${(slide.specialBoxes || []).map(b => `<div class="special-box box-${b.type}"><strong>${escapeHtml((b.type || '').toUpperCase())}:</strong> ${escapeHtml(b.content || '')}</div>`).join('')}
+                ${slide.screenshotPlaceholder ? `<div class="screenshot-placeholder">[Screenshot Placeholder]<br><small>${escapeHtml(slide.screenshotPlaceholder)}</small></div>` : ''}
+              </div>
+            </div>
+          `).join('')}
+          ${lesson.companionDoc ? `
+            <div class="companion-doc">
+              <h4>Companion Documentation</h4>
+              <details>
+                <summary style="cursor: pointer; color: #667eea; font-weight: 600;">Preview Documentation</summary>
+                <div class="doc-preview">${escapeHtml(lesson.companionDoc)}</div>
+              </details>
+            </div>
+          ` : ''}
+        </div>
+        </body></html>
+      `);
+    }
+
+    async function downloadGeneratedPptx(index) {
+      const lesson = window._generatedCourseData?.lessons[index];
+      if (!lesson) return;
+
+      try {
+        showToast('Generating PPTX...');
+        const res = await fetch(`${API_BASE}/lessons/download-pptx`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lessonData: { title: lesson.title, slides: lesson.slides, companionDoc: lesson.companionDoc } })
+        });
+
+        const { data } = await res.json();
+
+        // Convert base64 to blob and download
+        const byteCharacters = atob(data.content);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: data.contentType });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = data.filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showToast('PPTX downloaded!');
+      } catch (err) {
+        showToast('Error downloading PPTX');
+        console.error(err);
+      }
+    }
+
     // Initialize
     loadStats();
     loadCourses();
     loadProviders();
     loadReports();
+    loadApprovedReports();
     loadMappingRules();
     loadAuditLogs();
 

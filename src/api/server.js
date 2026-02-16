@@ -2,10 +2,24 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import Anthropic from '@anthropic-ai/sdk';
+import { readdir, readFile, writeFile } from 'fs/promises';
+import fetch from 'node-fetch';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import store from '../services/store/index.js';
 import watcher from '../services/watcher/index.js';
 import analyzer from '../services/analyzer/index.js';
 import { generatePowerPoint } from '../services/pptx-generator.js';
+import { generateCourseFromReports } from '../services/course-generator/index.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const TUTORIALS_DIR = join(__dirname, '..', 'data', 'tutorials');
+
+// GitHub repo for tutorial updates (owner/repo format)
+const GITHUB_REPO = process.env.GITHUB_REPO || 'malikamalik/myai-curriculum-engine';
+const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main';
+const GITHUB_RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}`;
 
 // Initialize Anthropic client
 const anthropic = new Anthropic();
@@ -122,6 +136,71 @@ app.get('/api/courses/:id/lessons', (req, res) => {
     res.json({ data: lessons, total: lessons.length, course_name: course.name });
   } catch (error) {
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
+  }
+});
+
+// Generate a course from approved impact reports
+app.post('/api/courses/generate', async (req, res) => {
+  try {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return res.status(500).json({
+        error: {
+          code: 'CONFIG_ERROR',
+          message: 'ANTHROPIC_API_KEY environment variable is not set. Please set it before restarting the API server.'
+        }
+      });
+    }
+
+    const { reportIds } = req.body;
+
+    if (!reportIds) {
+      return res.status(400).json({
+        error: {
+          code: 'BAD_REQUEST',
+          message: 'reportIds is required (array of report IDs or "all_approved")'
+        }
+      });
+    }
+
+    if (reportIds !== 'all_approved' && (!Array.isArray(reportIds) || reportIds.length === 0)) {
+      return res.status(400).json({
+        error: {
+          code: 'BAD_REQUEST',
+          message: 'reportIds must be "all_approved" or a non-empty array of report IDs'
+        }
+      });
+    }
+
+    const result = await generateCourseFromReports(anthropic, reportIds);
+
+    res.json({
+      data: result,
+      message: `Generated course "${result.course.name}" with ${result.course.lessonCount} lessons from ${result.reportsProcessed} reports`
+    });
+  } catch (error) {
+    console.error('Course generation error:', error);
+
+    if (error.message.includes('not found') || error.message.includes('not approved')) {
+      return res.status(400).json({
+        error: { code: 'BAD_REQUEST', message: error.message }
+      });
+    }
+
+    if (error.message.includes('No approved')) {
+      return res.status(400).json({
+        error: { code: 'BAD_REQUEST', message: error.message }
+      });
+    }
+
+    if (error.message.includes('No JSON found')) {
+      return res.status(500).json({
+        error: { code: 'PARSE_ERROR', message: 'Failed to parse AI response. Please try again.' }
+      });
+    }
+
+    res.status(500).json({
+      error: { code: 'INTERNAL_ERROR', message: error.message }
+    });
   }
 });
 
@@ -383,6 +462,143 @@ app.get('/api/dashboard/stats', (req, res) => {
       }
     });
   } catch (error) {
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
+  }
+});
+
+// ============================================
+// TUTORIAL TEMPLATES
+// ============================================
+
+// List available pre-built tutorials
+app.get('/api/tutorials', async (req, res) => {
+  try {
+    const files = await readdir(TUTORIALS_DIR);
+    const tutorials = [];
+
+    for (const file of files) {
+      if (!file.endsWith('.json')) continue;
+      const content = await readFile(join(TUTORIALS_DIR, file), 'utf-8');
+      const data = JSON.parse(content);
+      tutorials.push({
+        slug: data.slug,
+        title: data.title,
+        slideCount: data.slides?.length || 0,
+        provider: data.metadata?.provider || 'Unknown',
+        level: data.metadata?.level || 'Unknown',
+        audience: data.metadata?.audience || 'Unknown',
+        version: data.metadata?.version || '1.0.0',
+        lastUpdated: data.metadata?.lastUpdated || null,
+        hasScreenshotGuide: Array.isArray(data.screenshotGuide) && data.screenshotGuide.length > 0
+      });
+    }
+
+    res.json({ data: tutorials, total: tutorials.length });
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return res.json({ data: [], total: 0 });
+    }
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
+  }
+});
+
+// Check for tutorial updates from GitHub
+app.get('/api/tutorials/check-updates', async (req, res) => {
+  try {
+    const files = await readdir(TUTORIALS_DIR);
+    const updates = [];
+
+    for (const file of files) {
+      if (!file.endsWith('.json')) continue;
+      const localContent = await readFile(join(TUTORIALS_DIR, file), 'utf-8');
+      const localData = JSON.parse(localContent);
+      const localVersion = localData.metadata?.version || '1.0.0';
+
+      try {
+        const remoteUrl = `${GITHUB_RAW_BASE}/src/data/tutorials/${file}`;
+        const response = await fetch(remoteUrl);
+        if (!response.ok) continue;
+
+        const remoteData = await response.json();
+        const remoteVersion = remoteData.metadata?.version || '1.0.0';
+
+        if (remoteVersion !== localVersion) {
+          updates.push({
+            slug: localData.slug,
+            title: localData.title,
+            localVersion,
+            remoteVersion,
+            lastUpdated: remoteData.metadata?.lastUpdated || null,
+            updateAvailable: true
+          });
+        }
+      } catch {
+        // Remote fetch failed for this file, skip
+      }
+    }
+
+    res.json({ data: updates, total: updates.length });
+  } catch (error) {
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
+  }
+});
+
+// Update a specific tutorial from GitHub
+app.post('/api/tutorials/:slug/update', async (req, res) => {
+  try {
+    const file = `${req.params.slug}-tutorial.json`;
+    const filePath = join(TUTORIALS_DIR, file);
+
+    // Verify local file exists
+    try {
+      await readFile(filePath, 'utf-8');
+    } catch {
+      return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Tutorial not found locally' } });
+    }
+
+    // Fetch from GitHub
+    const remoteUrl = `${GITHUB_RAW_BASE}/src/data/tutorials/${file}`;
+    const response = await fetch(remoteUrl);
+
+    if (!response.ok) {
+      return res.status(502).json({ error: { code: 'UPSTREAM_ERROR', message: 'Failed to fetch tutorial from GitHub' } });
+    }
+
+    const remoteData = await response.json();
+
+    // Validate basic structure
+    if (!remoteData.slug || !remoteData.slides || !Array.isArray(remoteData.slides)) {
+      return res.status(502).json({ error: { code: 'VALIDATION_ERROR', message: 'Remote tutorial has invalid structure' } });
+    }
+
+    // Write updated file
+    await writeFile(filePath, JSON.stringify(remoteData, null, 2) + '\n', 'utf-8');
+
+    res.json({
+      data: {
+        slug: remoteData.slug,
+        version: remoteData.metadata?.version || '1.0.0',
+        lastUpdated: remoteData.metadata?.lastUpdated || null,
+        slideCount: remoteData.slides.length
+      },
+      message: `Tutorial "${remoteData.title}" updated to v${remoteData.metadata?.version || '1.0.0'}`
+    });
+  } catch (error) {
+    res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
+  }
+});
+
+// Get a specific tutorial by slug
+app.get('/api/tutorials/:slug', async (req, res) => {
+  try {
+    const filePath = join(TUTORIALS_DIR, `${req.params.slug}-tutorial.json`);
+    const content = await readFile(filePath, 'utf-8');
+    const data = JSON.parse(content);
+    res.json({ data });
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Tutorial not found' } });
+    }
     res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: error.message } });
   }
 });
@@ -776,6 +992,7 @@ app.listen(PORT, () => {
   console.log('  GET  /api/providers');
   console.log('  GET  /api/lessons');
   console.log('  GET  /api/courses');
+  console.log('  POST /api/courses/generate');
   console.log('  GET  /api/updates');
   console.log('  POST /api/updates/fetch');
   console.log('  GET  /api/impact-reports');
@@ -787,6 +1004,10 @@ app.listen(PORT, () => {
   console.log('  PUT  /api/mapping-rules/:id');
   console.log('  GET  /api/audit-logs');
   console.log('  GET  /api/dashboard/stats');
+  console.log('  GET  /api/tutorials');
+  console.log('  GET  /api/tutorials/check-updates');
+  console.log('  POST /api/tutorials/:slug/update');
+  console.log('  GET  /api/tutorials/:slug');
   console.log('  POST /api/lessons/generate');
   console.log('  POST /api/lessons/download-pptx');
 });
