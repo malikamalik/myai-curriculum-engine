@@ -1155,5 +1155,295 @@ app.post('/api/lessons/download-pptx', async (req, res) => {
   }
 });
 
+// ============================================
+// Course Generation (Stateless - no DB)
+// ============================================
+
+function buildArchitecturePrompt(reportsByProvider) {
+  const providerSections = Object.entries(reportsByProvider).map(([provider, { reports, updates }]) => {
+    const reportDetails = reports.map(r => {
+      const citationUrls = (r.citations || []).map(c => c.url).join('\n    - ');
+      return `  - Severity: ${r.severity} | Action: ${r.recommended_action}
+    Rationale: ${r.rationale}
+    Affected lessons: ${(r.affected_lessons || []).map(l => l.lesson_title).join(', ') || 'None'}
+    Citations: ${citationUrls || 'None'}`;
+    }).join('\n');
+
+    const updateDetails = updates.map(u => {
+      const docUrls = (u.doc_urls || []).map(d => `${d.label}: ${d.url}`).join('\n    - ');
+      return `  - "${u.title}" (${u.published_at || 'recent'})
+    Summary: ${u.summary || ''}
+    Source: ${u.source_url}
+    Docs: ${docUrls || 'None'}`;
+    }).join('\n');
+
+    return `### ${provider}\n**Impact Reports:**\n${reportDetails}\n\n**Underlying Updates:**\n${updateDetails}`;
+  }).join('\n\n');
+
+  return `You are a senior curriculum architect for MyAIcademy, a professional AI training platform.
+
+Based on the following approved impact reports and their underlying provider updates, design a cohesive course plan.
+
+## Source Material
+
+${providerSections}
+
+## Requirements
+
+Design a course with **3 to 6 lessons** that covers the most important updates across these providers.
+
+For each lesson, provide:
+1. **title** - Specific, action-oriented
+2. **provider** - Which AI provider this lesson focuses on
+3. **level** - beginner, intermediate, or advanced
+4. **scenario** - A realistic professional scenario the entire lesson is built around
+5. **objectives** - 3-5 specific, measurable learning objectives
+6. **keyTopics** - 5-8 specific features/capabilities to cover
+7. **difficulty_notes** - What makes this lesson challenging
+
+## Course Design Principles
+- Every lesson must be built around a **realistic professional scenario**
+- Focus on **platform-specific strengths, limitations, and hidden gotchas**
+- Include **competitor comparison context** where relevant
+- Prioritize **advanced configurations and edge cases** over basic walkthroughs
+- Ensure lessons progress in difficulty
+
+## Output Format
+Return ONLY valid JSON (no markdown blocks, no explanation):
+{
+  "courseName": "Descriptive course name",
+  "courseDescription": "1-2 sentence course summary",
+  "track": "everyone",
+  "level": "intermediate",
+  "lessons": [
+    {
+      "title": "...",
+      "provider": "...",
+      "level": "...",
+      "scenario": "...",
+      "objectives": ["..."],
+      "keyTopics": ["..."],
+      "difficulty_notes": "..."
+    }
+  ]
+}`;
+}
+
+function buildLessonGenerationPrompt(lessonPlan, reportsByProvider) {
+  const providerData = reportsByProvider[lessonPlan.provider] || {};
+  const sourceUrls = [];
+
+  (providerData.updates || []).forEach(u => {
+    if (u.source_url) sourceUrls.push(u.source_url);
+    (u.doc_urls || []).forEach(d => { if (d.url) sourceUrls.push(d.url); });
+  });
+  (providerData.reports || []).forEach(r => {
+    (r.citations || []).forEach(c => { if (c.url) sourceUrls.push(c.url); });
+  });
+
+  const uniqueUrls = [...new Set(sourceUrls)];
+
+  return `Create a complete hands-on workshop lesson for MyAIcademy with the following specifications:
+
+**Lesson Title:** ${lessonPlan.title}
+**AI Tool/Provider:** ${lessonPlan.provider}
+**Skill Level:** ${lessonPlan.level}
+**Target Audience:** Professional learners and AI practitioners
+**Learning Objectives:** ${lessonPlan.objectives.join('; ')}
+**Professional Scenario:** ${lessonPlan.scenario}
+**Key Topics to Cover:** ${lessonPlan.keyTopics.join(', ')}
+
+## STRATEGIC REQUIREMENTS (MANDATORY):
+
+### 1. Scenario-Based Design
+The ENTIRE lesson must be built around this scenario: "${lessonPlan.scenario}"
+
+### 2. Platform Analysis (REQUIRED in at least 2 specialBoxes)
+Include boxes analyzing what ${lessonPlan.provider} does better than competitors and known limitations.
+
+### 3. Best Practices & Warnings (MINIMUM COUNTS)
+At least 3 specialBoxes with type "bestpractice" and 3 with type "warning".
+
+### 4. Screenshot Instructions (DETAILED)
+Every screenshot slide must include exact URL, navigation path, expected UI state, and what to annotate.
+
+### 5. Difficulty Calibration
+${lessonPlan.difficulty_notes}
+
+### 6. Source Material
+${uniqueUrls.map(u => `- ${u}`).join('\n')}
+
+IMPORTANT:
+- Return ONLY valid JSON. No markdown code blocks, no explanation text.
+- Keep the "companionDoc" field to a BRIEF summary (under 500 words).`;
+}
+
+function extractJSONFromResponse(text) {
+  const match = text.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('No JSON found in response');
+
+  try {
+    return JSON.parse(match[0]);
+  } catch {
+    // Attempt truncated JSON repair
+    const jsonStr = match[0];
+    const slidesMatch = jsonStr.match(/"slides"\s*:\s*\[/);
+    if (!slidesMatch) throw new Error('No slides array found in truncated JSON');
+
+    const slidesStart = slidesMatch.index + slidesMatch[0].length;
+    let depth = 0, lastComplete = slidesStart, inStr = false, esc = false;
+
+    for (let i = slidesStart; i < jsonStr.length; i++) {
+      const ch = jsonStr[i];
+      if (esc) { esc = false; continue; }
+      if (ch === '\\') { esc = true; continue; }
+      if (ch === '"') { inStr = !inStr; continue; }
+      if (inStr) continue;
+      if (ch === '{') depth++;
+      if (ch === '}') { depth--; if (depth === 0) lastComplete = i + 1; }
+    }
+
+    if (lastComplete <= slidesStart) throw new Error('Could not repair truncated JSON');
+    return JSON.parse(jsonStr.slice(0, lastComplete) + '], "companionDoc": "See slides for full content." }');
+  }
+}
+
+async function callClaudeForCourse(prompt, userContent, maxTokens = 16000) {
+  let responseText = '';
+  const stream = await anthropic.messages.stream({
+    model: 'claude-opus-4-20250514',
+    max_tokens: maxTokens,
+    messages: [{ role: 'user', content: prompt + (userContent ? '\n\n' + userContent : '') }]
+  });
+  for await (const event of stream) {
+    if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+      responseText += event.delta.text;
+    }
+  }
+  return responseText;
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+app.post('/api/courses/generate', async (req, res) => {
+  try {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return res.status(500).json({
+        error: { code: 'CONFIG_ERROR', message: 'ANTHROPIC_API_KEY environment variable is not set.' }
+      });
+    }
+
+    const { reports, updates } = req.body;
+
+    if (!reports || !Array.isArray(reports) || reports.length === 0) {
+      return res.status(400).json({
+        error: { code: 'BAD_REQUEST', message: 'reports array is required (array of approved report objects with provider, severity, rationale, citations, affected_lessons)' }
+      });
+    }
+
+    // Group by provider
+    const reportsByProvider = {};
+    for (const report of reports) {
+      const provider = report.provider;
+      if (!reportsByProvider[provider]) {
+        reportsByProvider[provider] = { reports: [], updates: [] };
+      }
+      reportsByProvider[provider].reports.push(report);
+    }
+
+    // Attach updates to their providers
+    if (updates && Array.isArray(updates)) {
+      for (const update of updates) {
+        const provider = update.provider;
+        if (reportsByProvider[provider]) {
+          reportsByProvider[provider].updates.push(update);
+        }
+      }
+    }
+
+    // Phase 1: Course Architecture
+    const archPrompt = buildArchitecturePrompt(reportsByProvider);
+    let archText = await callClaudeForCourse(archPrompt, null, 4096);
+    let coursePlan;
+    try {
+      coursePlan = extractJSONFromResponse(archText);
+    } catch {
+      archText = await callClaudeForCourse(archPrompt, null, 4096);
+      coursePlan = extractJSONFromResponse(archText);
+    }
+
+    if (!coursePlan.lessons || coursePlan.lessons.length === 0) {
+      throw new Error('Course architecture returned no lessons');
+    }
+
+    // Phase 2: Generate each lesson
+    const generatedLessons = [];
+    for (let i = 0; i < coursePlan.lessons.length; i++) {
+      const lessonPlan = coursePlan.lessons[i];
+      if (i > 0) await delay(2000);
+
+      const lessonUserPrompt = buildLessonGenerationPrompt(lessonPlan, reportsByProvider);
+      let lessonText = await callClaudeForCourse(MYAICADEMY_TEMPLATE_PROMPT, lessonUserPrompt, 16000);
+
+      let lessonData;
+      try {
+        lessonData = extractJSONFromResponse(lessonText);
+      } catch {
+        await delay(2000);
+        lessonText = await callClaudeForCourse(MYAICADEMY_TEMPLATE_PROMPT, lessonUserPrompt, 16000);
+        lessonData = extractJSONFromResponse(lessonText);
+      }
+
+      lessonData.metadata = {
+        generatedAt: new Date().toISOString(),
+        provider: lessonPlan.provider,
+        level: lessonPlan.level,
+        audience: 'Professional learners',
+        slideCount: lessonData.slides?.length || 0,
+        scenario: lessonPlan.scenario,
+        generatedFromCourse: true
+      };
+
+      generatedLessons.push({
+        title: lessonData.title || lessonPlan.title,
+        provider: lessonPlan.provider,
+        level: lessonPlan.level,
+        slideCount: lessonData.slides?.length || 0,
+        slides: lessonData.slides,
+        companionDoc: lessonData.companionDoc,
+        metadata: lessonData.metadata
+      });
+    }
+
+    res.json({
+      data: {
+        course: {
+          name: coursePlan.courseName,
+          description: coursePlan.courseDescription,
+          track: coursePlan.track || 'everyone',
+          level: coursePlan.level || 'intermediate',
+          lessonCount: generatedLessons.length
+        },
+        lessons: generatedLessons,
+        reportsProcessed: reports.length,
+        providersIncluded: Object.keys(reportsByProvider)
+      },
+      message: `Generated course "${coursePlan.courseName}" with ${generatedLessons.length} lessons from ${reports.length} reports`
+    });
+  } catch (error) {
+    console.error('Course generation error:', error);
+
+    if (error.message.includes('No JSON found')) {
+      return res.status(500).json({
+        error: { code: 'PARSE_ERROR', message: 'Failed to parse AI response. Please try again.' }
+      });
+    }
+
+    res.status(500).json({
+      error: { code: 'INTERNAL_ERROR', message: error.message }
+    });
+  }
+});
+
 // Export for Vercel
 export default app;

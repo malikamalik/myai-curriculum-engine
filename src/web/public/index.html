@@ -1308,7 +1308,8 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const API_BASE = 'http://localhost:3001/api';
+    const isVercel = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    const API_BASE = isVercel ? '/api' : 'http://localhost:3001/api';
 
     // State
     let currentTrack = 'all';
@@ -2070,10 +2071,22 @@
       try {
         logProgress('Sending generation request to server...');
 
+        // On Vercel (no DB), send full report/update objects; locally send IDs
+        let requestBody;
+        if (isVercel) {
+          const selectedReports = approvedReports.filter(r => selectedIds.includes(r.id));
+          // Gather updates for the selected providers
+          const providerNames = [...new Set(selectedReports.map(r => r.provider))];
+          const relatedUpdates = allUpdates.filter(u => providerNames.includes(u.provider));
+          requestBody = { reports: selectedReports, updates: relatedUpdates };
+        } else {
+          requestBody = { reportIds: selectedIds };
+        }
+
         const res = await fetch(`${API_BASE}/courses/generate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reportIds: selectedIds })
+          body: JSON.stringify(requestBody)
         });
 
         clearInterval(progressInterval);
